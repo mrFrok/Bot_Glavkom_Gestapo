@@ -1,0 +1,18 @@
+
+dpython:S1192£"FDefine a constant instead of duplicating this literal '4.jpg' 4 times.(ØÖ‹Óşÿÿÿÿ
+dpython:S1192¾"FDefine a constant instead of duplicating this literal '5.jpg' 3 times.(¥Ó½¼üÿÿÿÿ
+bpython:S1192÷"IDefine a constant instead of duplicating this literal "technic/" 5 times.(ıûª•
+_python:S1192š"FDefine a constant instead of duplicating this literal '1.jpg' 4 times.(¬µƒ
+dpython:S1192"FDefine a constant instead of duplicating this literal '2.jpg' 4 times.(Ö Å³øÿÿÿÿ
+apython:S1192›"HDefine a constant instead of duplicating this literal "images/" 6 times.(Ô¾åê
+hpython:S1192³"JDefine a constant instead of duplicating this literal "legions/" 18 times.(ÒÆÙ—ıÿÿÿÿ
+gpython:S1192ï"IDefine a constant instead of duplicating this literal "clones/" 64 times.(‹íÕñúÿÿÿÿ
+dpython:S1192©"FDefine a constant instead of duplicating this literal '6.jpg' 3 times.(¦ÌÄôùÿÿÿÿ
+_python:S1192 "FDefine a constant instead of duplicating this literal '3.jpg' 4 times.(¿Âª
+Tpython:S5754"<Specify an exception class to catch or reraise the exception(ˆÊÉ·
+bpython:S3457&"EAdd replacement fields or use a normal string instead of an f-string.(¶ñ¥ùÿÿÿÿ
+rpython:S3776¯"TRefactor this function to reduce its Cognitive Complexity from 18 to the 15 allowed.(€¥£Ëøÿÿÿÿ
+rpython:S3776ë"TRefactor this function to reduce its Cognitive Complexity from 64 to the 15 allowed.(¤çáÔûÿÿÿÿ
+python:S1871—"cEither merge this branch with the identical one on line "404" or change one of the implementations.(‹íÕñúÿÿÿÿ
+^python:S3457ç"EAdd replacement fields or use a normal string instead of an f-string.(³Ôÿ”
+Upython:S5754ì"<Specify an exception class to catch or reraise the exception(ˆÊÉ·

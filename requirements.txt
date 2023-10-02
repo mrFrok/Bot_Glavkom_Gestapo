@@ -1,0 +1,6 @@
+aiogram
+async
+openai
+translators
+pyjokes
+pyrogram

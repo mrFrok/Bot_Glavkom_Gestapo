@@ -1,0 +1,40 @@
+
+Æpython:S1192 "§Define a constant instead of duplicating this literal '   ĞĞµ Ğ¿Ñ€Ğ°Ğ²Ğ¸Ğ»ÑŒĞ½Ğ¾ Ğ½Ğ°Ğ¿Ğ¸ÑĞ°Ğ½Ğ¾!\nĞĞ°Ğ¿Ñ€Ğ¸Ğ¼ĞµÑ€:\n`/Ğ¼ÑƒÑ‚ 1 Ñ‡ Ğ¿Ñ€Ğ¸Ñ‡Ğ¸Ğ½Ğ° \n /Ğ¼ÑƒÑ‚ 1 Ğ¼ Ğ¿Ñ€Ğ¸Ñ‡Ğ¸Ğ½Ğ° \n /Ğ¼ÑƒÑ‚ 1 Ğ´ Ğ¿Ñ€Ğ¸Ñ‡Ğ¸Ğ½Ğ° \n /Ğ¼ÑƒÑ‚ 1 Ğ³ Ğ¿Ñ€Ğ¸Ñ‡Ğ¸Ğ½Ğ° \n /Ğ¼ÑƒÑ‚ Ğ½Ğ°Ğ²ÑĞµĞ³Ğ´Ğ° Ğ¿Ñ€Ğ¸Ñ‡Ğ¸Ğ½Ğ°`' 4 times.( È”d8÷æéØ1
+opython:S1192:"KDefine a constant instead of duplicating this literal "Ğ¼Ğ¸Ğ½ÑƒÑ‚" 4 times.(ä«£áùÿÿÿÿ8øæéØ1
+lpython:S1192"HDefine a constant instead of duplicating this literal r'@(\w+)' 3 times.(ôç‘ºşÿÿÿÿ8øæéØ1
+upython:S1192""QDefine a constant instead of duplicating this literal "Ğ½Ğ°Ğ²ÑĞµĞ³Ğ´Ğ°" 4 times.(Èîòùÿÿÿÿ8øæéØ1
+Ãpython:S1192-"¤Define a constant instead of duplicating this literal 'ĞĞµ Ğ¿Ñ€Ğ°Ğ²Ğ¸Ğ»ÑŒĞ½Ğ¾ Ğ½Ğ°Ğ¿Ğ¸ÑĞ°Ğ½Ğ¾!\nĞĞ°Ğ¿Ñ€Ğ¸Ğ¼ĞµÑ€:\n`/Ğ¼ÑƒÑ‚ 1 Ñ‡ Ğ¿Ñ€Ğ¸Ñ‡Ğ¸Ğ½Ğ° \n /Ğ¼ÑƒÑ‚ 1 Ğ¼ Ğ¿Ñ€Ğ¸Ñ‡Ğ¸Ğ½Ğ° \n /Ğ¼ÑƒÑ‚ 1 Ğ´ Ğ¿Ñ€Ğ¸Ñ‡Ğ¸Ğ½Ğ° \n /Ğ¼ÑƒÑ‚ 1 Ğ³ Ğ¿Ñ€Ğ¸Ñ‡Ğ¸Ğ½Ğ° \n /Ğ¼ÑƒÑ‚ Ğ½Ğ°Ğ²ÑĞµĞ³Ğ´Ğ° Ğ¿Ñ€Ğ¸Ñ‡Ğ¸Ğ½Ğ°`' 3 times.( È”d8ùæéØ1
+opython:S11920"KDefine a constant instead of duplicating this literal "Ñ‡Ğ°ÑĞ¾Ğ²" 4 times.(°ÃÈ˜şÿÿÿÿ8ùæéØ1
+xpython:S3776"TRefactor this function to reduce its Cognitive Complexity from 87 to the 15 allowed.(Àã±äÿÿÿÿÿ8Ë¤ÖÑ1
+[python:S5754"<Specify an exception class to catch or reraise the exception(ˆÊÉ·8Ì¤ÖÑ1
+[python:S5754"<Specify an exception class to catch or reraise the exception(ˆÊÉ·8Ì¤ÖÑ1
+[python:S5754&"<Specify an exception class to catch or reraise the exception(ˆÊÉ·8Ì¤ÖÑ1
+[python:S57545"<Specify an exception class to catch or reraise the exception(ˆÊÉ·8Ì¤ÖÑ1
+[python:S5754?"<Specify an exception class to catch or reraise the exception(ˆÊÉ·8Ì¤ÖÑ1
+[python:S5754I"<Specify an exception class to catch or reraise the exception(ˆÊÉ·8Ì¤ÖÑ1
+[python:S5754S"<Specify an exception class to catch or reraise the exception(ˆÊÉ·8Ì¤ÖÑ1
+[python:S5754]"<Specify an exception class to catch or reraise the exception(ˆÊÉ·8Ì¤ÖÑ1
+[python:S5754c"<Specify an exception class to catch or reraise the exception(ˆÊÉ·8Ì¤ÖÑ1
+[python:S5754g"<Specify an exception class to catch or reraise the exception(ˆÊÉ·8Ì¤ÖÑ1
+[python:S5754n"<Specify an exception class to catch or reraise the exception(ˆÊÉ·8Ì¤ÖÑ1
+[python:S5754}"<Specify an exception class to catch or reraise the exception(ˆÊÉ·8Ì¤ÖÑ1
+\python:S5754ˆ"<Specify an exception class to catch or reraise the exception(ˆÊÉ·8Ì¤ÖÑ1
+\python:S5754“"<Specify an exception class to catch or reraise the exception(ˆÊÉ·8şæéØ1
+\python:S5754"<Specify an exception class to catch or reraise the exception(ˆÊÉ·8şæéØ1
+ypython:S3776µ"TRefactor this function to reduce its Cognitive Complexity from 76 to the 15 allowed.(œú´üÿÿÿÿ8Ì¤ÖÑ1
+\python:S5754Á"<Specify an exception class to catch or reraise the exception(ˆÊÉ·8ÿæéØ1
+\python:S5754Å"<Specify an exception class to catch or reraise the exception(ˆÊÉ·8ÿæéØ1
+\python:S5754Ğ"<Specify an exception class to catch or reraise the exception(ˆÊÉ·8ÿæéØ1
+\python:S5754“"<Specify an exception class to catch or reraise the exception(ˆÊÉ·8€çéØ1
+\python:S5754š"<Specify an exception class to catch or reraise the exception(ˆÊÉ·8€çéØ1
+\python:S5754"<Specify an exception class to catch or reraise the exception(ˆÊÉ·8€çéØ1
+\python:S5754ª"<Specify an exception class to catch or reraise the exception(ˆÊÉ·8€çéØ1
+\python:S5754¼"<Specify an exception class to catch or reraise the exception(ˆÊÉ·8€çéØ1
+\python:S5754Ù"<Specify an exception class to catch or reraise the exception(ˆÊÉ·8€çéØ1
+\python:S5754è"<Specify an exception class to catch or reraise the exception(ˆÊÉ·8€çéØ1
+\python:S5754ù"<Specify an exception class to catch or reraise the exception(ˆÊÉ·8çéØ1
+epython:S3457ú"EAdd replacement fields or use a normal string instead of an f-string.(ã¥ª÷8€çéØ1
+\python:S5754·"<Specify an exception class to catch or reraise the exception(ˆÊÉ·8çéØ1
+\python:S5754Ã"<Specify an exception class to catch or reraise the exception(ˆÊÉ·8çàòÙ1
+Tpython:S1481×"/Remove the unused local variable "member_name".(í„ƒËûÿÿÿÿ8Ì¤ÖÑ1
+epython:S3457Û"EAdd replacement fields or use a normal string instead of an f-string.(¹Ù•8Ì¤ÖÑ1
