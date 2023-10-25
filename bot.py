@@ -6,7 +6,7 @@ from aiogram import Bot, Dispatcher
 from aiogram.enums import ParseMode
 import handlers
 from handlers import commands
-from os import getenv
+
 
 bot = Bot(token=config.TOKEN, parse_mode=ParseMode.HTML)
 dp = Dispatcher()

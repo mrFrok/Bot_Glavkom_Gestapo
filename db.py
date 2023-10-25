@@ -56,6 +56,7 @@ def full_update(userid, username, name):
     c.execute('UPDATE hui SET username=? WHERE userid =?',
               (name, userid))
     c.execute('UPDATE varns SET username=? WHERE userid = ?', (name, userid))
+    c.execute('UPDATE nedrochabr SET username=? WHERE userid =?', (name, userid))
     conn.commit()
 
 
@@ -108,3 +109,25 @@ def get_users():
     user = c.fetchall()
     return user
 
+def add_user_nedr(userid, username, status):
+    c.execute('INSERT INTO nedrochabr (userid, username, status) VALUES (?,?,?)', (userid, username, status))
+    conn.commit()
+
+def update_user_nedr(userid, username, status):
+    c.execute('UPDATE nedrochabr SET username=?, status=?, perehod=1 WHERE userid =?', (username, status, userid))
+    conn.commit()
+
+def get_status_nedr(userid):
+    c.execute('SELECT status FROM nedrochabr WHERE userid =?', (userid,))
+    user = c.fetchone()
+    return user
+
+def get_users_nedr():
+    c.execute('SELECT userid, username, status FROM nedrochabr')
+    user = c.fetchall()
+    return user
+
+def get_user_nedr(userid):
+    c.execute('SELECT username, status, perehod FROM nedrochabr WHERE userid =?', (userid,))
+    user = c.fetchone()
+    return user

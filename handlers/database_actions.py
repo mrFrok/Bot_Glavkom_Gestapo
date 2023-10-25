@@ -1,13 +1,14 @@
 import random
 from aiogram import types, Router, F
-from aiogram.filters import Command
+from aiogram.filters import Command, IS_ADMIN, CREATOR
 from bot import dp, bot
 import time
 from aiogram.types import ContentType, Message
 from random import randint, choice
 import config
 from db import add_user, update_user, update_hui, get_user, get_top_users, get_users, delete_user, \
-    add_user_if_not_exists, add_hui, get_user_hui, full_update
+    add_user_if_not_exists, add_hui, get_user_hui, full_update,add_user_nedr, update_user_nedr, get_status_nedr, get_users_nedr, \
+    get_user_nedr
 import datetime
 from pyrogram_config import get_chat_members_id, get_chat_members_name, get_chat_members_username
 from filters import IsAdminFilter
@@ -19,9 +20,12 @@ router = Router()
 async def start(message: types.Message):
     userid = message.from_user.id
     a = get_user(userid)
-    if a is None:
+    if int(message.chat.id) - int(config.GROUP_ID) != 0:
+        await message.reply('Вы не состоите в группе!')
+    elif a is None:
         username = message.from_user.username
         name = message.from_user.full_name
+        print(username, name)
         add_user(userid, username, name)
         await message.reply('Вы успешно добавленны в базу данных')
     elif a[2] != message.from_user.full_name or a[1] != message.from_user.username:
@@ -36,7 +40,9 @@ async def hui(message: types.Message):
     now = datetime.datetime.now()
     userid = message.from_user.id
     a = get_user_hui(userid)
-    if a is None:
+    if int(message.chat.id) - int(config.GROUP_ID) != 0:
+        await message.reply('Вы не состоите в группе!')
+    elif a is None:
         razm_hui = randint(-3, 10)
         username = message.from_user.full_name
         add_hui(userid, username, razm_hui, now.day, now.month, now.year)
@@ -109,6 +115,7 @@ async def who(message: types.Message):
 @router.message(F.left_chat_member)
 async def on_chat_member_left(message: types.Message):
     user = message.left_chat_member
+    delete_user(user.id)
     await message.answer(
         f'Прощай, <a href="tg://user?id={user.id}">{user.full_name}</a>. Мы будем тебя помнить(Или нет)')
 
@@ -161,4 +168,52 @@ async def dobbd(message: types.Message):
 
     await message.reply(f'Добавлено {added_users_count} пользователей')
 
+@router.message(Command('учавствовать_в_недрочабре', 'увн', prefix='!'))
+async def nedr(message: types.Message):
+    member_id = message.from_user.id
+    member_name = message.from_user.full_name
+    a = get_status_nedr(member_id)
+    now_day = datetime.datetime.now()
+    is_admin = await bot.get_chat_member(message.chat.id, message.from_user.id)
+    if a != None:
+        await message.answer(f'Вы уже участвуете в недрочабре! Сейчас вы {a[0]}')
+    elif now_day.day != 1 or now_day.month != 11:
+        await message.answer(f"Сейчас не первое ноября, регистрация закрыта!")
+    elif CREATOR.check(member=is_admin) == True:
+        add_user_nedr(member_id, member_name, "Гранд магистр🟪")
+        await message.answer(f'Поздравляем, теперь вы участвуете в недрочабре! Теперь вы {"Гранд Магистр🟪"}')
+    elif IS_ADMIN.check(member=is_admin) == True:
+        add_user_nedr(member_id, member_name, "Магистр🟩")
+        await message.answer(f'Поздравляем, теперь вы участвуете в недрочабре! Теперь вы {"Мастер🟩"}')
+    else:
+        add_user_nedr(member_id, member_name, "Джедай🟦")
+        await message.answer(f'Поздравляем, теперь вы участвуете в недрочабре! Теперь вы {"Джедай🟦"}')
 
+@router.message(Command('перейти_на_темную_сторону', 'пнтс', 'пасть', prefix='!'))
+async def pnts(message: types.Message):
+    member_id = message.from_user.id
+    member_name = message.from_user.full_name
+    a = get_user_nedr(member_id)
+    is_admin = await bot.get_chat_member(message.chat.id, message.from_user.id)
+    if a == None:
+        await message.answer(f'Вы не участвуете в недрочабре! Пропишите команду !увн для участия(Если сегодня 1 ноября)')
+    elif a[2] == 1:
+        await message.answer(f'Вы уже перешли на тёмную сторону! Сейчас вы {a[1]}')
+    elif CREATOR.check(member=is_admin) == True:
+        update_user_nedr(member_id, member_name, "Владыка ситхов⬛")
+        await message.answer(f'Вы перешли на тёмную сторону! Теперь вы {"Владыка ситхов⬛"}')
+    elif IS_ADMIN.check(member=is_admin) == True:
+        update_user_nedr(member_id, member_name, "Дарт🟧")
+        await message.answer(f"Вы перешли на тёмную сторону! Теперь вы {'Дарт🟧'}")
+    else:
+        update_user_nedr(member_id, member_name, 'Ситх 🟥')
+        await message.answer(f'Вы перешли на тёмную сторону! Теперь вы {"Cитх🟥"}')
+
+
+@router.message(Command('участники_недрочабря', 'ун', prefix='!'))
+async def top_nedr(message: types.Message):
+    users = get_users_nedr()
+    response = 'Участники недрочабря:\n'
+    for i, (userid, username, status) in enumerate(users, start=1):
+        response += f'{i}. <a href="tg://user?id={userid}">{username}</a> - {status}\n'
+    await message.answer(response)
