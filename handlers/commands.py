@@ -24,6 +24,14 @@ async def set_command(bot: Bot):
         BotCommand(
             command='auid',
             description='Добавить пользователей в БД'
+        ),
+        BotCommand(
+            command='start',
+            description='Начало работы, внесение в базу данных, изменение никнейма в базе данных'
+        ),
+        BotCommand(
+            command='help',
+            description='Список всех команд бота'
         )
     ]
 

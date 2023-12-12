@@ -394,6 +394,7 @@ async def unmute(message):
                     muteid = get_user_from_username(mention.group(1))[0]
                 except:
                     await message.reply(f'Вы не указали пользователя')
+                    return
                 await message.bot.delete_message(message.chat.id, message.message_id)
                 await message.bot.restrict_chat_member(chat_id=message.chat.id,
                                                        user_id=muteid,
@@ -439,74 +440,154 @@ async def new_members_handler(message: Message):
 @router.message(IsAdminFilter(is_admin=True), Command('варн', 'Варн', 'Varn', 'varn', prefix="!/"))
 async def varn(message: types.Message):
     if not message.reply_to_message:
-        await message.reply("Эта команда должна быть ответом на сообщение!")
-        return
-    member_id = message.reply_to_message.from_user.id
-    member_name = message.reply_to_message.from_user.full_name
-    admin = message.from_user.mention_html()
-    a = get_varn_users(member_id)
-    if a is None:
-        try:
-            reason_a = message.text.split()[1]
-            reason_a = message.text.split()[1:]
-            reason = " ".join(reason_a)
-            new_varn_user(member_id, member_name, 1, reason)
-            await message.answer(
-                f'Пользователю <a href="tg://user?id={message.reply_to_message.from_user.id}">{message.reply_to_message.from_user.full_name}</a> был выдан варн админом {admin} по причине {reason}. Сейчас количество варнов у пользователя составляет {1}')
-        except:
-            new_varn_user(member_id, member_name, 1, 'Без причины')
-            await message.answer(
-                f'Пользователю <a href="tg://user?id={message.reply_to_message.from_user.id}">{message.reply_to_message.from_user.full_name}</a> был выдан варн админом {admin}. Сейчас количество варнов у пользователя составляет {1}')
+        mention = re.search(r'@(\w+)', message.text)
+        if mention:
+            muteid1 = get_user_from_username(mention.group(1))
+            if muteid1 != None:
+                try:
+                    muteid = get_user_from_username(mention.group(1))[0]
+                except:
+                    await message.reply(f'Вы не указали пользователя')
+                await message.bot.delete_message(message.chat.id, message.message_id)
+                admin = message.from_user.mention_html()
+                a = get_varn_users(muteid)
+                if a is None:
+                    try:
+                        reason_a = message.text.split()[2]
+                        reason_a = message.text.split()[2:]
+                        reason = " ".join(reason_a)
+                        new_varn_user(muteid, mention.group(1), 1, reason)
+                        await message.answer(
+                            f'Пользователю <a href="tg://user?id={muteid}">{mention.group(1)}</a> был выдан варн админом {admin} по причине {reason}. \nСейчас количество варнов у пользователя составляет {1}')
+                        return
+                    except:
+                        new_varn_user(muteid, mention.group(1), 1, 'Без причины')
+                        await message.answer(
+                            f'Пользователю <a href="tg://user?id={muteid}">{mention.group(1)}</a> был выдан варн админом {admin}. \nСейчас количество варнов у пользователя составляет {1}')
+                        return
+                else:
+                    if a[0] == 1:
+                        try:
+                            reason_a = message.text.split()[2:]
+                            reason = " ".join(reason_a)
+                            update_varn_user(muteid, 2, reason)
+                            await message.answer(
+                                f'Пользователю <a href="tg://user?id={muteid}">{mention.group(1)}</a> был выдан варн админом {admin} по причине {reason}. \nСейчас количество варнов у пользователя составляет {2}')
+                        except:
+                            update_varn_user(muteid, 2, 'Без причины')
+                            await message.answer(
+                                f'Пользователю <a href="tg://user?id={muteid}">{mention.group(1)}</a> был выдан варн админом {admin}. \nСейчас количество варнов у пользователя составляет {2}')
+                            return
+                    elif a[0] >= 2:
+                        await bot.ban_chat_member(message.chat.id, muteid,
+                                                  until_date=int(time.time()) + 7 * 86400)
+                        await message.answer(
+                            f' | <b>Решение выдать бан было принято:</b> {admin}\n | <b>Нарушитель:</b> <a href="tg://user?id={muteid}">{mention.group(1)}</a>\n⏰ | <b>Срок наказания:</b> 1 неделя\n | <b>Причина:</b> Нарушитель получил 3 варна',
+                            parse_mode='html')
+                        return
+        else:
+            await message.reply('Вы не указали пользователя!')
     else:
-        if a[0] == 1:
+        member_id = message.reply_to_message.from_user.id
+        member_name = message.reply_to_message.from_user.full_name
+        admin = message.from_user.mention_html()
+        a = get_varn_users(member_id)
+        if a is None:
             try:
+                reason_a = message.text.split()[1]
                 reason_a = message.text.split()[1:]
                 reason = " ".join(reason_a)
-                update_varn_user(member_id, 2, reason)
+                new_varn_user(member_id, member_name, 1, reason)
                 await message.answer(
-                    f'Пользователю <a href="tg://user?id={message.reply_to_message.from_user.id}">{message.reply_to_message.from_user.full_name}</a> был выдан варн админом {admin} по причине {reason}. Сейчас количество варнов у пользователя составляет {2}')
+                    f'Пользователю <a href="tg://user?id={message.reply_to_message.from_user.id}">{message.reply_to_message.from_user.full_name}</a> был выдан варн админом {admin} по причине {reason}. \nСейчас количество варнов у пользователя составляет {1}')
             except:
-                update_varn_user(member_id, 2, 'Без причины')
+                new_varn_user(member_id, member_name, 1, 'Без причины')
                 await message.answer(
-                    f'Пользователю <a href="tg://user?id={message.reply_to_message.from_user.id}">{message.reply_to_message.from_user.full_name}</a> был выдан варн админом {admin}. Сейчас количество варнов у пользователя составляет {2}')
+                    f'Пользователю <a href="tg://user?id={message.reply_to_message.from_user.id}">{message.reply_to_message.from_user.full_name}</a> был выдан варн админом {admin}. \nСейчас количество варнов у пользователя составляет {1}')
+        else:
+            if a[0] == 1:
+                try:
+                    reason_a = message.text.split()[1:]
+                    reason = " ".join(reason_a)
+                    update_varn_user(member_id, 2, reason)
+                    await message.answer(
+                        f'Пользователю <a href="tg://user?id={message.reply_to_message.from_user.id}">{message.reply_to_message.from_user.full_name}</a> был выдан варн админом {admin} по причине {reason}. \nСейчас количество варнов у пользователя составляет {2}')
+                except:
+                    update_varn_user(member_id, 2, 'Без причины')
+                    await message.answer(
+                        f'Пользователю <a href="tg://user?id={message.reply_to_message.from_user.id}">{message.reply_to_message.from_user.full_name}</a> был выдан варн админом {admin}. \nСейчас количество варнов у пользователя составляет {2}')
 
-        elif a[0] >= 2:
-            await bot.ban_chat_member(message.chat.id, message.reply_to_message.from_user.id,
-                                      until_date=int(time.time()) + 7 * 86400)
-            await message.answer(
-                f' | <b>Решение выдать бан было принято:</b> {admin}\n | <b>Нарушитель:</b> <a href="tg://user?id={message.reply_to_message.from_user.id}">{message.reply_to_message.from_user.full_name}</a>\n⏰ | <b>Срок наказания:</b> 1 неделя\n | <b>Причина:</b> Нарушитель получил 3 варна',
-                parse_mode='html')
+            elif a[0] >= 2:
+                await bot.ban_chat_member(message.chat.id, message.reply_to_message.from_user.id,
+                                          until_date=int(time.time()) + 7 * 86400)
+                await message.answer(
+                    f' | <b>Решение выдать бан было принято:</b> {admin}\n | <b>Нарушитель:</b> <a href="tg://user?id={message.reply_to_message.from_user.id}">{message.reply_to_message.from_user.full_name}</a>\n⏰ | <b>Срок наказания:</b> 1 неделя\n | <b>Причина:</b> Нарушитель получил 3 варна',
+                    parse_mode='html')
 
 
 @router.message(IsAdminFilter(is_admin=True), Command('Снять_варн', 'снять_варн', 'варн-', '-варн', prefix="!/"))
 async def varn_minus(message: types.Message):
     if not message.reply_to_message:
-        await message.reply("Эта команда должна быть ответом на сообщение!")
-        return
-    member_id = int(message.reply_to_message.from_user.id)
-    member_name = message.reply_to_message.from_user.full_name
-    admin = message.from_user.mention_html()
-    a = get_varn_users(member_id)
-    if a is None:
-        await message.reply(f"У пользователя нет варнов")
+        mention = re.search(r'@(\w+)', message.text)
+        if mention:
+            muteid1 = get_user_from_username(mention.group(1))
+            if muteid1 != None:
+                try:
+                    muteid = get_user_from_username(mention.group(1))[0]
+                except:
+                    await message.reply(f'Вы не указали пользователя')
+                    return
+                await message.bot.delete_message(message.chat.id, message.message_id)
+                admin = message.from_user.mention_html()
+                a = get_varn_users(muteid)
+                if a is None:
+                    await message.reply(f"У пользователя нет варнов")
+                else:
+                    try:
+                        b = message.text.split()[2]
+                        if str(b) == 'все':
+                            delete_varn_user(muteid)
+                            await message.answer(
+                                f'Пользователю <a href="tg://user?id={muteid}">{mention.group(1)}</a> были сняты все варны админом {admin}.')
+                        else:
+                            await message.answer(f'Нет такого аргумента как "{b}"')
+                    except IndexError:
+                        if a[0] == 1:
+                            delete_varn_user(muteid)
+                            await message.answer(
+                                f'Пользователю <a href="tg://user?id={muteid}">{mention.group(1)}</a> был снят один варн админом {admin}. \nСейчас количество варнов у пользователя составляет {0}')
+                        elif a[0] == 2:
+                            update_varn_user(muteid, 1, None)
+                            await message.answer(
+                                f'Пользователю <a href="tg://user?id={muteid}">{mention.group(1)}</a> был снят один варн админом {admin}. \nСейчас количество варнов у пользователя составляет {1}')
+
+        else:
+            await message.reply('Вы не указали пользователя!')
     else:
-        try:
-            b = message.text.split()[1]
-            if str(b) == 'все':
-                delete_varn_user(member_id)
-                await message.answer(
-                    f'Пользователю <a href="tg://user?id={message.reply_to_message.from_user.id}">{message.reply_to_message.from_user.full_name}</a> были сняты все варны админом {admin}.')
-            else:
-                await message.answer(f'Нет такого аргумента как "{b}"')
-        except IndexError:
-            if a[0] == 1:
-                delete_varn_user(member_id)
-                await message.answer(
-                    f'Пользователю <a href="tg://user?id={message.reply_to_message.from_user.id}">{message.reply_to_message.from_user.full_name}</a> был снят один варн админом {admin}. Сейчас количество варнов у пользователя составляет {0}')
-            elif a[0] == 2:
-                update_varn_user(member_id, 1, None)
-                await message.answer(
-                    f'Пользователю <a href="tg://user?id={message.reply_to_message.from_user.id}">{message.reply_to_message.from_user.full_name}</a> был снят один варн админом {admin}. Сейчас количество варнов у пользователя составляет {1}')
+        member_id = int(message.reply_to_message.from_user.id)
+        member_name = message.reply_to_message.from_user.full_name
+        admin = message.from_user.mention_html()
+        a = get_varn_users(member_id)
+        if a is None:
+            await message.reply(f"У пользователя нет варнов")
+        else:
+            try:
+                b = message.text.split()[1]
+                if str(b) == 'все':
+                    delete_varn_user(member_id)
+                    await message.answer(
+                        f'Пользователю <a href="tg://user?id={message.reply_to_message.from_user.id}">{message.reply_to_message.from_user.full_name}</a> были сняты все варны админом {admin}.')
+                else:
+                    await message.answer(f'Нет такого аргумента как "{b}"')
+            except IndexError:
+                if a[0] == 1:
+                    delete_varn_user(member_id)
+                    await message.answer(
+                        f'Пользователю <a href="tg://user?id={message.reply_to_message.from_user.id}">{message.reply_to_message.from_user.full_name}</a> был снят один варн админом {admin}. Сейчас количество варнов у пользователя составляет {0}')
+                elif a[0] == 2:
+                    update_varn_user(member_id, 1, None)
+                    await message.answer(
+                        f'Пользователю <a href="tg://user?id={message.reply_to_message.from_user.id}">{message.reply_to_message.from_user.full_name}</a> был снят один варн админом {admin}. Сейчас количество варнов у пользователя составляет {1}')
 
 
 @router.message(IsAdminFilter(is_admin=True), Command('варнинфо', 'Варнинфо', 'Ви', 'ви', prefix="!/"))

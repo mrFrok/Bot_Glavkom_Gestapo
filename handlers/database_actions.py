@@ -120,7 +120,7 @@ async def on_chat_member_left(message: types.Message):
         f'Прощай, <a href="tg://user?id={user.id}">{user.full_name}</a>. Мы будем тебя помнить(Или нет)')
 
 
-@router.message(Command('созвать всех', 'св', 'созвать_всех', 'Созвать_всех', 'Св', prefix='!'))
+@router.message(Command('созвать всех', 'св', 'созвать_всех', 'Созвать_всех', 'Св', 'созыв', 'Созыв', prefix='!'))
 async def soziv(message: types.Message):
     users = get_users()
     await message.answer(
@@ -168,6 +168,7 @@ async def dobbd(message: types.Message):
 
     await message.reply(f'Добавлено {added_users_count} пользователей')
 
+"""
 @router.message(Command('учавствовать_в_недрочабре', 'увн', prefix='!'))
 async def nedr(message: types.Message):
     member_id = message.from_user.id
@@ -217,3 +218,4 @@ async def top_nedr(message: types.Message):
     for i, (userid, username, status) in enumerate(users, start=1):
         response += f'{i}. <a href="tg://user?id={userid}">{username}</a> - {status}\n'
     await message.answer(response)
+"""
