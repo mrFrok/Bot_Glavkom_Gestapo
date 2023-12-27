@@ -39,7 +39,6 @@ def get_user_hui(userid):
     hui = c.fetchone()
     return hui
 
-
 def add_hui(userid, username, razm_hui, day, month, year):
     c.execute('INSERT INTO hui (userid, username, razm_hui, day, month, year) VALUES (?,?,?,?,?, ?)',
               (userid, username, razm_hui, day, month, year))
@@ -56,7 +55,8 @@ def full_update(userid, username, name):
     c.execute('UPDATE hui SET username=? WHERE userid =?',
               (name, userid))
     c.execute('UPDATE varns SET username=? WHERE userid = ?', (name, userid))
-    c.execute('UPDATE nedrochabr SET username=? WHERE userid =?', (name, userid))
+    #c.execute('UPDATE nedrochabr SET username=? WHERE userid =?', (name, userid))
+    c.execute('UPDATE reminder SET name=? WHERE userid =?', (name, userid))
     conn.commit()
 
 
@@ -131,3 +131,25 @@ def get_user_nedr(userid):
     c.execute('SELECT username, status, perehod FROM nedrochabr WHERE userid =?', (userid,))
     user = c.fetchone()
     return user
+
+def new_reminder(userid, name):
+    c.execute('INSERT INTO reminder (userid, name, active) VALUES (?, ?, 1)', (userid, name))
+    conn.commit()
+
+def check_reminder(userid):
+    c.execute('SELECT active FROM reminder WHERE userid=?', (userid,))
+    user = c.fetchone()
+    return user
+
+def delete_reminder(userid):
+    c.execute('DELETE FROM reminder WHERE userid=?', (userid,))
+    conn.commit()
+
+def update_reminder(userid, time):
+    c.execute('UPDATE reminder SET time = ? WHERE userid =?', (time, userid))
+    conn.commit()
+
+def get_reminders():
+    c.execute('SELECT userid FROM reminder')
+    users = c.fetchall()
+    return users

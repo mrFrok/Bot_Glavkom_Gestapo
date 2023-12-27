@@ -1,6 +1,6 @@
 aiogram
 async
-openai
 translators
 pyjokes
 pyrogram
+g4f

@@ -6,10 +6,20 @@ from aiogram import Bot, Dispatcher
 from aiogram.enums import ParseMode
 import handlers
 from handlers import commands
-
+from apscheduler.schedulers.asyncio import AsyncIOScheduler
+import datetime
+import apsched
 
 bot = Bot(token=config.TOKEN, parse_mode=ParseMode.HTML)
 dp = Dispatcher()
+
+"""
+scheduler = AsyncIOScheduler(timezone='Europe/Moscow')
+scheduler.add_job(apsched.send_remind, 'interval', seconds=10, kwargs={'bot': bot})
+
+scheduler.start()
+asyncio.get_event_loop().run_forever()
+"""
 
 #Главная функция
 async def main():

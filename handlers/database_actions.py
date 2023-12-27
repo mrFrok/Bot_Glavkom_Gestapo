@@ -7,11 +7,14 @@ from aiogram.types import ContentType, Message
 from random import randint, choice
 import config
 from db import add_user, update_user, update_hui, get_user, get_top_users, get_users, delete_user, \
-    add_user_if_not_exists, add_hui, get_user_hui, full_update,add_user_nedr, update_user_nedr, get_status_nedr, get_users_nedr, \
-    get_user_nedr
+    add_user_if_not_exists, add_hui, get_user_hui, full_update, add_user_nedr, update_user_nedr, get_status_nedr, \
+    get_users_nedr, \
+    get_user_nedr, check_reminder, new_reminder, update_reminder, delete_reminder
 import datetime
 from pyrogram_config import get_chat_members_id, get_chat_members_name, get_chat_members_username
 from filters import IsAdminFilter
+from aiogram.fsm.context import FSMContext
+from states import Form
 
 router = Router()
 
@@ -112,6 +115,18 @@ async def who(message: types.Message):
     await message.answer(f'Мне кажется, что <a href="tg://user?id={answer_id}">{answer_name}</a> {messages}')
 
 
+@router.message(F.new_chat_member)
+async def new_members_handler(message: Message):
+    new_member = message.new_chat_members[0]
+    add_user_if_not_exists(new_member.id, new_member.full_name, new_member.username)
+    await bot.send_message(message.chat.id,
+                           f'Добро пожаловать, <a href="tg://user?id={new_member.id}">{new_member.full_name}</a>! Ты попал в лучшую группу, здесь рады всем! \n'
+                           f"В этой группе ты можешь найти новых друзей, общаться с самыми лучшими, дружными и адекватными людьми со всего света \n"
+                           f"С правилами ты можешь ознакомиться <a href = 'https://t.me/pmcfemboy228/3836/3837'>здесь</a> \n"
+                           f"Так же у нас есть <a href = 'https://discord.gg/wWFxVGJsmQ'>Discord</a>\n"
+                           f"Больше не буду задерживать, удачи!")
+
+
 @router.message(F.left_chat_member)
 async def on_chat_member_left(message: types.Message):
     user = message.left_chat_member
@@ -167,6 +182,51 @@ async def dobbd(message: types.Message):
             added_users_count += 1
 
     await message.reply(f'Добавлено {added_users_count} пользователей')
+
+'''
+@router.message(Command('рассылка', 'Рассылка', prefix='!'))
+async def reminder(message: types.Message, state: FSMContext):
+    check = check_reminder(message.from_user.id)
+    if check == None:
+        await state.set_state(Form.question1)
+        await message.reply(
+            f'Сейчас вы не подписаны на рассылку. Вы хотите подписаться на рассылку?(Напишите Да/Нет)\nВНИМАНИЕ! Чтобы бот мог прислать вам напоминание, вы должны начать с ним чат!')
+    else:
+        await state.set_state(Form.question1)
+        await message.reply(
+            f'Прямо сейчас вы подписаны на рассылку. Желаете ли вы отписаться от рассылки или изменить время получения рассылки?\nВведите "Отписаться", чтобы отписаться от рассылки или "изменить", чтобы изменить время.')
+
+
+@router.message(Form.question1)
+async def form_question1(message: Message, state: FSMContext):
+    await state.update_data(question1=message.text)
+    que = await state.get_data()
+    await state.clear()
+    question = que['question1']
+    if question.lower() == 'да':
+        new_reminder(message.from_user.id, message.from_user.full_name)
+        await message.reply(
+            f'Вы успешно подписались на рассылку. Теперь, каждый день в 6:00 по МСК вы будете получать рассылку.\nУбедитесь, что вы начали чат с ботом, иначе он не сможет присылать сообщения')
+    else:
+        await message.reply(f'Как хотите.')
+'''
+"""
+@router.message(Form.question2)
+async def form_question2(message: Message, state: FSMContext):
+    if message.text.isdigit():
+        await state.update_data(question2=message.text)
+        que = await state.get_data()
+        time = int(que['question2'])
+        if time >= 0 and time <= 24:
+            new_reminder(message.from_user.id, message.from_user.full_name, time)
+            await message.reply(
+                f'Вы успешно подписались на рассылку. Теперь, каждый день в {time} час(-ов, -а).\nУбедитесь, что вы начали чат с ботом, иначе он не сможет присылать сообщения')
+            await state.clear()
+        else:
+            await message.reply(f'Неправильное время! Должно быть от 0 до 24, попробуйте снова!')
+    else:
+        await message.reply(f'Вы ввели часы неправильно! Попробуйте заново')
+"""
 
 """
 @router.message(Command('учавствовать_в_недрочабре', 'увн', prefix='!'))

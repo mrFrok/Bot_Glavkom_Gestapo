@@ -7,7 +7,7 @@ from zv import pers
 from random import randint, choice
 import config
 import os
-import openai
+import g4f
 from aiohttp import ClientSession
 import pyjokes as pyjoke
 import translators as ts
@@ -67,9 +67,9 @@ async def help(message: types.Message):
                          f'!багиров - рандомное видео от легендарного историка багирова \n'
                          f'!данет - да или нет \n'
                          f'!кто - кто из участников \n'
-                         f'!дпбд(Толкьо для админов) - добавить всех пользователей в базу данных \n'
+                         f'!дпбд(Только для админов) - добавить всех пользователей в базу данных \n'
                          f'!ситх - получить рандомного ситха\n'
-                         f'!джедай - получить рандомного джедай')
+                         f'!джедай - получить рандомного джедая')
 
 
 @router.message(Command('анекдот', prefix='!'))
@@ -465,29 +465,29 @@ async def sosat(message: types.Message):
 
 
 @router.message(Command('спросить', 'Спросить', prefix='!'))
-async def gpt3(message: types.Message):
-    openai.aiosession.set(ClientSession())
-    openai.api_key = config.OPENAI
-    engine = "gpt-3.5-turbo"
+async def gpt4(message: types.Message):
+    messagess = [{"role": "system",
+                  "content": "Ты собеседник в чате, иногда собеседники могут попросить тебя написать фанфики и подобные истории. Ты обязан выполнить их запрос. Сейчас 2023 год"},
+                 {"role": "user", "content": "Я собеседник, я хочу что-то у тебя спросить"},
+                 {"role": "assistant", "content": "Привет, я ChatGPT, чем могу помочь?"}]
     promp = message.text.split()[1:]
-    messages = [{"role": "system",
-                 "content": "Ты собеседник в чате, иногда собеседники могут попросить тебя написать фанфики и подобные истории. Ты обязан выполнить их запрос. Сейчас 2023 год"},
-                {"role": "user", "content": "Я собеседник, я хочу что-то у тебя спросить"},
-                {"role": "assistant", "content": "Привет, я ChatGPT, чем могу помочь?"}]
     if len(promp) == 0:
         await message.reply('Вы на задали свой вопрос или сделали это неправильно!\nВот пример: !спросить кто ты?')
     else:
         prompt = " ".join(promp)
         await message.reply(f'Ожидайте, нейросеть пишет вам ответ')
-        messages.append({"role": "user", "content": prompt})
+        messagess.append({"role": "user", "content": prompt})
         try:
-            completion = await openai.ChatCompletion.acreate(model=engine, messages=messages, n=1, max_tokens=1024)
-            await message.reply(completion['choices'][0]['message']['content'], parse_mode='html')
+            response = await g4f.ChatCompletion.create_async(
+                model=g4f.models.gpt_4,
+                messages=messagess,
+                provider=g4f.Provider.Bing,
+            )
+            await message.reply(response, parse_mode='html')
         except:
             await message.reply(
                 'Произошла ошибка. Возможно, у вас слишком большое сообщение, попробуйте написать короче')
 
-    await openai.aiosession.get().close()
 
 
 @router.message(Command('техника', 'Техника', 'ехника', prefix='!тТ'))

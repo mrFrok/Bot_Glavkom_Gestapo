@@ -424,19 +424,6 @@ async def unmute(message):
             f'Пользователю <a href="tg://user?id={message.reply_to_message.from_user.id}">{message.reply_to_message.from_user.full_name}</a> был снят мут админом {mutitel}',
             parse_mode='html')
 
-
-@router.message(F.new_chat_member)
-async def new_members_handler(message: Message):
-    new_member = message.new_chat_members[0]
-    add_user_if_not_exists(new_member.id, new_member.full_name, new_member.username)
-    await bot.send_message(message.chat.id,
-                           f'Добро пожаловать, <a href="tg://user?id={new_member.id}">{new_member.full_name}</a>! Ты попал в лучшую группу, здесь рады всем! \n'
-                           f"В этой группе ты можешь найти новых друзей, общаться с самыми лучшими, дружными и адекватными людьми со всего света \n"
-                           f"С правилами ты можешь ознакомиться <a href = 'https://t.me/c/1817240369/239383/239387'>здесь</a> \n"
-                           f"Так же у нас есть <a href = 'https://discord.gg/wWFxVGJsmQ'>Discord</a>\n"
-                           f"Больше не буду задерживать, удачи!")
-
-
 @router.message(IsAdminFilter(is_admin=True), Command('варн', 'Варн', 'Varn', 'varn', prefix="!/"))
 async def varn(message: types.Message):
     if not message.reply_to_message:
