@@ -4,3 +4,4 @@ translators
 pyjokes
 pyrogram
 g4f
+setuptools
