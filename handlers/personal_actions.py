@@ -480,13 +480,12 @@ async def gpt4(message: types.Message):
         _providers = [
             g4f.Provider.Bing,
             g4f.Provider.GeekGpt,
-            g4f.Provider.Liaobots,
             g4f.Provider.Phind
         ]
         response = [
             await askgpt(messagess, provider) for provider in _providers
             ]
-        response = sorted(response, key=lambda x: (float('inf') if x is None else -len(str(x)), x))
+        response = sorted(response, key=lambda x: (float('inf') if x is None or "DOCTYPE html" in str(x) else -len(str(x)), x))
         if response[0] == None:
             await message.reply(
                 'Произошла ошибка. Возможно, у вас слишком большое сообщение, попробуйте написать короче')
