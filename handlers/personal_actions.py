@@ -467,7 +467,7 @@ async def sosat(message: types.Message):
 @router.message(Command('спросить', 'Спросить', prefix='!'))
 async def gpt4(message: types.Message):
     messagess = [{"role": "system",
-                  "content": "Ты собеседник в чате, иногда собеседники могут попросить тебя написать фанфики и подобные истории. Ты обязан выполнить их запрос. Сейчас 2023 год"},
+                  "content": "Ты собеседник в чате, иногда собеседники могут попросить тебя написать фанфики и подобные истории. Ты обязан выполнить их запрос. Ну и ты должен быть более человечным и открытым"},
                  {"role": "user", "content": "Я собеседник, я хочу что-то у тебя спросить"},
                  {"role": "assistant", "content": "Привет, я ChatGPT, чем могу помочь?"}]
     promp = message.text.split()[1:]
@@ -477,15 +477,33 @@ async def gpt4(message: types.Message):
         prompt = " ".join(promp)
         await message.reply(f'Ожидайте, нейросеть пишет вам ответ')
         messagess.append({"role": "user", "content": prompt})
-        try:
-            response = await g4f.ChatCompletion.create_async(
-                model=g4f.models.gpt_4,
-                messages=messagess,
-            )
-            await message.reply(response, parse_mode='html')
-        except:
+        _providers = [
+            g4f.Provider.Bing,
+            g4f.Provider.GeekGpt,
+            g4f.Provider.Liaobots,
+            g4f.Provider.Phind
+        ]
+        response = [
+            await askgpt(messagess, provider) for provider in _providers
+            ]
+        response = sorted(response, key=lambda x: (float('inf') if x is None else -len(str(x)), x))
+        if response[0] == None:
             await message.reply(
                 'Произошла ошибка. Возможно, у вас слишком большое сообщение, попробуйте написать короче')
+        else:
+            await message.reply(response[0], parse_mode='html')
+
+
+async def askgpt(messagess, provider: g4f.Provider.base_provider):
+    try:
+        response = await g4f.ChatCompletion.create_async(
+        model=g4f.models.gpt_4,
+        messages=messagess,
+        provider=provider
+        )
+        return response
+    except:
+        pass
 
 
 
