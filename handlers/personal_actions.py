@@ -481,7 +481,6 @@ async def gpt4(message: types.Message):
             response = await g4f.ChatCompletion.create_async(
                 model=g4f.models.gpt_4,
                 messages=messagess,
-                provider=g4f.Provider.Bing,
             )
             await message.reply(response, parse_mode='html')
         except:
