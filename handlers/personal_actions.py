@@ -482,15 +482,18 @@ async def gpt4(message: types.Message):
             g4f.Provider.GeekGpt,
             g4f.Provider.Phind
         ]
-        response = [
-            await askgpt(messagess, provider) for provider in _providers
+        try:
+            response = [
+                await askgpt(messagess, provider) for provider in _providers
             ]
-        response = sorted(response, key=lambda x: (float('inf') if x is None or "DOCTYPE html" in str(x) else -len(str(x)), x))
-        if response[0] == None:
+            response1 = sorted(response, key=lambda x: (
+            float('inf') if x is None or "DOCTYPE html" in str(x) else -len(str(x)), x))
+            response = [x for x in response1 if
+                        isinstance(x, str) and x.strip() and "DOCTYPE html" not in x and "iostream" not in x]
+            await message.reply(response[0], parse_mode='html')
+        except:
             await message.reply(
                 'Произошла ошибка. Возможно, у вас слишком большое сообщение, попробуйте написать короче')
-        else:
-            await message.reply(response[0], parse_mode='html')
 
 
 async def askgpt(messagess, provider: g4f.Provider.base_provider):
