@@ -1,20 +1,17 @@
 import random
 from aiogram import types, Router, F
-from aiogram.filters import Command, IS_ADMIN, CREATOR
+from aiogram.filters import Command
 from bot import dp, bot
-import time
-from aiogram.types import ContentType, Message
+from aiogram.types import Message
 from random import randint, choice
 import config
-from db import add_user, update_user, update_hui, get_user, get_top_users, get_users, delete_user, \
-    add_user_if_not_exists, add_hui, get_user_hui, full_update, add_user_nedr, update_user_nedr, get_status_nedr, \
+from db import add_user, update_user, update_dick, get_user, get_top_dicks, get_users, delete_user, \
+    add_user_if_not_exists, add_dick, get_user_dick, full_update, add_user_nedr, update_user_nedr, get_status_nedr, \
     get_users_nedr, \
     get_user_nedr, check_reminder, new_reminder, update_reminder, delete_reminder
 import datetime
 from pyrogram_config import get_chat_members_id, get_chat_members_name, get_chat_members_username
 from filters import IsAdminFilter
-from aiogram.fsm.context import FSMContext
-from states import Form
 
 router = Router()
 
@@ -26,12 +23,12 @@ async def start(message: types.Message):
     if int(message.chat.id) - int(config.GROUP_ID) != 0:
         await message.reply('Вы не состоите в группе!')
     elif a is None:
+        date_add = str(datetime.datetime.now())
         username = message.from_user.username
         name = message.from_user.full_name
-        print(username, name)
-        add_user(userid, username, name)
+        add_user(userid, username, name, date_add)
         await message.reply('Вы успешно добавленны в базу данных')
-    elif a[2] != message.from_user.full_name or a[1] != message.from_user.username:
+    elif a[3] != message.from_user.full_name or a[2] != message.from_user.username:
         full_update(userid, message.from_user.username, message.from_user.full_name)
         await message.reply('Ваше имя успешно изменено')
     else:
@@ -39,68 +36,46 @@ async def start(message: types.Message):
 
 
 @router.message(Command('писька', 'хуй', prefix='!'))
-async def hui(message: types.Message):
-    now = datetime.datetime.now()
+async def dick(message: types.Message):
+    last_used = datetime.datetime.now()
     userid = message.from_user.id
-    a = get_user_hui(userid)
+    a = get_user_dick(userid)
     if int(message.chat.id) - int(config.GROUP_ID) != 0:
         await message.reply('Вы не состоите в группе!')
     elif a is None:
-        razm_hui = randint(-3, 10)
-        username = message.from_user.full_name
-        add_hui(userid, username, razm_hui, now.day, now.month, now.year)
-        await message.reply(f'Ваш размер хуя теперь равен {razm_hui} см')
+        size = randint(-3, 10)
+        name = message.from_user.full_name
+        add_dick(userid, name, size, last_used)
+        await message.reply(f'Ваш размер хуя теперь равен {size} см')
     else:
-        razm_hui = randint(-10, 20)
-        if a[4] < now.month:
-            if a[2] > a[2] + razm_hui:
-                update_hui(a[2] + razm_hui, now.day, now.month, now.year, userid)
+        size = randint(-10, 20)
+        if last_used - datetime.datetime.strptime(a[4], '%Y-%m-%d %H:%M:%S.%f') > datetime.timedelta(hours=24):
+            if a[3] > a[3] + size:
+                update_dick(a[3] + size, last_used, userid)
                 await message.reply(
-                    f'Ваш хуй уменьшился на {razm_hui} см, теперь он равен {a[2] + razm_hui} см')
-            elif a[2] == a[2] + razm_hui:
-                update_hui(a[2] + razm_hui, now.day, now.month, now.year, userid)
-                await message.reply(f'Ваш хуй не изменился, сейчас он равен {a[2]} см')
+                    f'Ваш хуй уменьшился на {size} см, теперь он равен {a[3] + size} см')
+            elif a[3] < a[3] + size:
+                update_dick(a[3] + size, last_used, userid)
+                await message.reply(
+                    f'Ваш хуй увеличился на {size} см, теперь он равен {a[3] + size} см')
             else:
-                update_hui(a[2] + razm_hui, now.day, now.month, now.year, userid)
-                await message.reply(
-                    f'Ваш хуй увеличился на {razm_hui} см, теперь он равен {a[2] + razm_hui} см')
+                update_dick(a[3] + size, last_used, userid)
+                await message.reply(f'Ваш хуй не изменился, сейчас он равен {a[3]} см')
         else:
-            if a[5] < now.year:
-                if a[2] > a[2] + razm_hui:
-                    update_hui(a[2] + razm_hui, now.day, now.month, now.year, userid)
-                    await message.reply(
-                        f'Ваш хуй уменьшился на {razm_hui} см, теперь он равен {a[2] + razm_hui} см')
-                elif a[2] == a[2] + razm_hui:
-                    update_hui(a[2] + razm_hui, now.day, now.month, now.year, userid)
-                    await message.reply(f'Ваш хуй не изменился, сейчас он равен {a[2]} см')
-                else:
-                    update_hui(a[2] + razm_hui, now.day, now.month, now.year, userid)
-                    await message.reply(
-                        f'Ваш хуй увеличился на {razm_hui} см, теперь он равен {a[2] + razm_hui} см')
-            else:
-                if a[3] == now.day:
-                    await message.reply(
-                        f'Вы уже пытались вырастить хуй сегодня, возвращайтесь завтра! Сейчас ваш хуй равен {a[2]} см')
-                elif a[3] < now.day:
-                    if a[2] > a[2] + razm_hui:
-                        update_hui(a[2] + razm_hui, now.day, now.month, now.year, userid)
-                        await message.reply(
-                            f'Ваш хуй уменьшился на {razm_hui} см, теперь он равен {a[2] + razm_hui} см')
-                    elif a[2] == a[2] + razm_hui:
-                        update_hui(a[2] + razm_hui, now.day, now.month, now.year, userid)
-                        await message.reply(f'Ваш хуй не изменился, сейчас он равен {a[2]} см')
-                    else:
-                        update_hui(a[2] + razm_hui, now.day, now.month, now.year, userid)
-                        await message.reply(
-                            f'Ваш хуй увеличился на {razm_hui} см, теперь он равен {a[2] + razm_hui} см')
+            time_since_last_use = last_used - datetime.datetime.strptime(a[4], '%Y-%m-%d %H:%M:%S.%f')
+            time_since_last_use = time_since_last_use - datetime.timedelta(
+                microseconds=time_since_last_use.microseconds)
+            time_until_next_use = datetime.timedelta(hours=24) - time_since_last_use
+            await message.reply(
+                f'Вы уже пытались вырастить хуй сегодня, возвращайтесь через {time_until_next_use}! Сейчас ваш хуй равен {a[3]} см')
 
 
 @router.message(Command('топ_хуев', 'тх', prefix='!'))
 async def top_hui(message: types.Message):
-    top_hui = get_top_users()
+    top_hui = get_top_dicks()
     response = 'Топ-10 хуёв:\n'
-    for i, (userid, username, razm_hui) in enumerate(top_hui, start=1):
-        response += f'{i}. <a href="tg://user?id={userid}">{username}</a> ({razm_hui} см)\n'
+    for i, (userid, name, size) in enumerate(top_hui, start=1):
+        response += f'{i}. <a href="tg://user?id={userid}">{name}</a> ({size} см)\n'
     await message.answer(response)
 
 
@@ -110,15 +85,15 @@ async def who(message: types.Message):
     rand = choice(users)
     messages1 = message.text.split()[1:]
     messages = ' '.join(messages1)
-    answer_id = get_user(int(rand[0]))[0]
-    answer_name = get_user(int(rand[0]))[2]
+    answer_id = get_user(int(rand[0]))[1]
+    answer_name = get_user(int(rand[0]))[3]
     await message.answer(f'Мне кажется, что <a href="tg://user?id={answer_id}">{answer_name}</a> {messages}')
 
 
 @router.message(F.new_chat_member)
 async def new_members_handler(message: Message):
     new_member = message.new_chat_members[0]
-    add_user_if_not_exists(new_member.id, new_member.full_name, new_member.username)
+    add_user(new_member.id, new_member.username, new_member.full_name, datetime.datetime.now())
     await bot.send_message(message.chat.id,
                            f'Добро пожаловать, <a href="tg://user?id={new_member.id}">{new_member.full_name}</a>! Ты попал в лучшую группу, здесь рады всем! \n'
                            f"В этой группе ты можешь найти новых друзей, общаться с самыми лучшими, дружными и адекватными людьми со всего света \n"
@@ -136,7 +111,7 @@ async def on_chat_member_left(message: types.Message):
 
 
 @router.message(Command('созвать всех', 'св', 'созвать_всех', 'Созвать_всех', 'Св', 'созыв', 'Созыв', prefix='!'))
-async def soziv(message: types.Message):
+async def calling(message: types.Message):
     users = get_users()
     await message.answer(
         f'Пользователь <a href="tg://user?id={message.from_user.id}">{message.from_user.full_name}</a> запустил призыв')
@@ -158,7 +133,9 @@ async def soziv(message: types.Message):
     chunks = [users[i:i + chunk_size] for i in range(0, len(users), chunk_size)]
 
     for chunk in chunks:
-        mention_text = ''.join([f'<a href="tg://user?id={user[0]}">{random.choice(emoji_list)}</a>' for user in chunk])
+        random.shuffle(emoji_list)
+        mention_text = ''.join(
+            [f'<a href="tg://user?id={user[0]}">{emoji}</a>' for user, emoji in zip(chunk, emoji_list[:len(chunk)])])
         await message.answer(f'{mention_text}')
 
     await message.answer(f'Созыв окончен')
@@ -178,10 +155,11 @@ async def dobbd(message: types.Message):
 
     for i, x, y in zip(chat_members_id, chat_members_name, chat_members_username):
         if not await is_bot(i, message):  # Проверяем, не является ли пользователь ботом
-            add_user_if_not_exists(i, y, x)
+            add_user_if_not_exists(i, y, x, datetime.datetime.now())
             added_users_count += 1
 
     await message.reply(f'Добавлено {added_users_count} пользователей')
+
 
 '''
 @router.message(Command('рассылка', 'Рассылка', prefix='!'))

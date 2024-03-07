@@ -1,15 +1,14 @@
 import asyncio
 import logging
+from aiogram.client.default import DefaultBotProperties
 import config
 import sys
 from aiogram import Bot, Dispatcher
 from aiogram.enums import ParseMode
 import handlers
 from handlers import commands
-import datetime
-import apsched
 
-bot = Bot(token=config.TOKEN, parse_mode=ParseMode.HTML)
+bot = Bot(token=config.TOKEN, default=DefaultBotProperties(parse_mode=ParseMode.HTML))
 dp = Dispatcher()
 
 """
@@ -20,7 +19,8 @@ scheduler.start()
 asyncio.get_event_loop().run_forever()
 """
 
-#Главная функция
+
+# Главная функция
 async def main():
     # Регистрация роутеров
     dp.include_routers(handlers.admin_actions.router, handlers.database_actions.router,
@@ -39,4 +39,3 @@ if __name__ == "__main__":
 
     # Асинхронный запуск бота
     asyncio.run(main())
-

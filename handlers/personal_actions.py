@@ -1,14 +1,11 @@
-from aiogram import types, Router, F
-import time
+from aiogram import types, Router
 from aiogram.filters import Command
 from aiogram.types import FSInputFile
 import list
 from zv import pers
 from random import randint, choice
-import config
 import os
 import g4f
-from aiohttp import ClientSession
 import pyjokes as pyjoke
 import translators as ts
 

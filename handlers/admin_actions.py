@@ -1,8 +1,8 @@
-from aiogram import types, Router, F
-from aiogram.types import chat_permissions, Message
-from aiogram.filters import Command, IS_ADMIN, ChatMemberUpdatedFilter
+import datetime
+from aiogram import types, Router
+from aiogram.types import chat_permissions
+from aiogram.filters import Command
 import time
-import config
 from filters import IsAdminFilter
 from db import new_varn_user, get_varn_users, update_varn_user, get_top_varn_users, delete_varn_user, add_user, \
     get_user_from_name, add_user_if_not_exists, get_user_from_username, get_user
@@ -424,6 +424,7 @@ async def unmute(message):
             f'Пользователю <a href="tg://user?id={message.reply_to_message.from_user.id}">{message.reply_to_message.from_user.full_name}</a> был снят мут админом {mutitel}',
             parse_mode='html')
 
+
 @router.message(IsAdminFilter(is_admin=True), Command('варн', 'Варн', 'Varn', 'varn', prefix="!/"))
 async def varn(message: types.Message):
     if not message.reply_to_message:
@@ -443,12 +444,12 @@ async def varn(message: types.Message):
                         reason_a = message.text.split()[2]
                         reason_a = message.text.split()[2:]
                         reason = " ".join(reason_a)
-                        new_varn_user(muteid, mention.group(1), 1, reason)
+                        new_varn_user(muteid, mention.group(1), 1, reason, datetime.datetime.now())
                         await message.answer(
                             f'Пользователю <a href="tg://user?id={muteid}">{mention.group(1)}</a> был выдан варн админом {admin} по причине {reason}. \nСейчас количество варнов у пользователя составляет {1}')
                         return
                     except:
-                        new_varn_user(muteid, mention.group(1), 1, 'Без причины')
+                        new_varn_user(muteid, mention.group(1), 1, 'Без причины', datetime.datetime.now())
                         await message.answer(
                             f'Пользователю <a href="tg://user?id={muteid}">{mention.group(1)}</a> был выдан варн админом {admin}. \nСейчас количество варнов у пользователя составляет {1}')
                         return
@@ -457,11 +458,11 @@ async def varn(message: types.Message):
                         try:
                             reason_a = message.text.split()[2:]
                             reason = " ".join(reason_a)
-                            update_varn_user(muteid, 2, reason)
+                            update_varn_user(muteid, 2, reason, datetime.datetime.now())
                             await message.answer(
                                 f'Пользователю <a href="tg://user?id={muteid}">{mention.group(1)}</a> был выдан варн админом {admin} по причине {reason}. \nСейчас количество варнов у пользователя составляет {2}')
                         except:
-                            update_varn_user(muteid, 2, 'Без причины')
+                            update_varn_user(muteid, 2, 'Без причины', datetime.datetime.now())
                             await message.answer(
                                 f'Пользователю <a href="tg://user?id={muteid}">{mention.group(1)}</a> был выдан варн админом {admin}. \nСейчас количество варнов у пользователя составляет {2}')
                             return
@@ -476,7 +477,7 @@ async def varn(message: types.Message):
             await message.reply('Вы не указали пользователя!')
     else:
         member_id = message.reply_to_message.from_user.id
-        member_name = message.reply_to_message.from_user.full_name
+        member_name = message.reply_to_message.from_user.username
         admin = message.from_user.mention_html()
         a = get_varn_users(member_id)
         if a is None:
@@ -484,11 +485,11 @@ async def varn(message: types.Message):
                 reason_a = message.text.split()[1]
                 reason_a = message.text.split()[1:]
                 reason = " ".join(reason_a)
-                new_varn_user(member_id, member_name, 1, reason)
+                new_varn_user(member_id, member_name, 1, reason, datetime.datetime.now())
                 await message.answer(
                     f'Пользователю <a href="tg://user?id={message.reply_to_message.from_user.id}">{message.reply_to_message.from_user.full_name}</a> был выдан варн админом {admin} по причине {reason}. \nСейчас количество варнов у пользователя составляет {1}')
             except:
-                new_varn_user(member_id, member_name, 1, 'Без причины')
+                new_varn_user(member_id, member_name, 1, 'Без причины', datetime.datetime.now())
                 await message.answer(
                     f'Пользователю <a href="tg://user?id={message.reply_to_message.from_user.id}">{message.reply_to_message.from_user.full_name}</a> был выдан варн админом {admin}. \nСейчас количество варнов у пользователя составляет {1}')
         else:
@@ -496,11 +497,11 @@ async def varn(message: types.Message):
                 try:
                     reason_a = message.text.split()[1:]
                     reason = " ".join(reason_a)
-                    update_varn_user(member_id, 2, reason)
+                    update_varn_user(member_id, 2, reason, datetime.datetime.now())
                     await message.answer(
                         f'Пользователю <a href="tg://user?id={message.reply_to_message.from_user.id}">{message.reply_to_message.from_user.full_name}</a> был выдан варн админом {admin} по причине {reason}. \nСейчас количество варнов у пользователя составляет {2}')
                 except:
-                    update_varn_user(member_id, 2, 'Без причины')
+                    update_varn_user(member_id, 2, 'Без причины', datetime.datetime.now())
                     await message.answer(
                         f'Пользователю <a href="tg://user?id={message.reply_to_message.from_user.id}">{message.reply_to_message.from_user.full_name}</a> был выдан варн админом {admin}. \nСейчас количество варнов у пользователя составляет {2}')
 
@@ -544,7 +545,7 @@ async def varn_minus(message: types.Message):
                             await message.answer(
                                 f'Пользователю <a href="tg://user?id={muteid}">{mention.group(1)}</a> был снят один варн админом {admin}. \nСейчас количество варнов у пользователя составляет {0}')
                         elif a[0] == 2:
-                            update_varn_user(muteid, 1, None)
+                            update_varn_user(muteid, 1, None, datetime.datetime.now())
                             await message.answer(
                                 f'Пользователю <a href="tg://user?id={muteid}">{mention.group(1)}</a> был снят один варн админом {admin}. \nСейчас количество варнов у пользователя составляет {1}')
 
@@ -572,7 +573,7 @@ async def varn_minus(message: types.Message):
                     await message.answer(
                         f'Пользователю <a href="tg://user?id={message.reply_to_message.from_user.id}">{message.reply_to_message.from_user.full_name}</a> был снят один варн админом {admin}. Сейчас количество варнов у пользователя составляет {0}')
                 elif a[0] == 2:
-                    update_varn_user(member_id, 1, None)
+                    update_varn_user(member_id, 1, None, datetime.datetime.now())
                     await message.answer(
                         f'Пользователю <a href="tg://user?id={message.reply_to_message.from_user.id}">{message.reply_to_message.from_user.full_name}</a> был снят один варн админом {admin}. Сейчас количество варнов у пользователя составляет {1}')
 
@@ -581,6 +582,6 @@ async def varn_minus(message: types.Message):
 async def varn_info(message: types.Message):
     varns_info = get_top_varn_users()
     response = 'Варны у участников:\n'
-    for i, (userid, username, value_varns, reason) in enumerate(varns_info, start=1):
-        response += f'{i}. <a href="tg://user?id={userid}">{username}</a> количество варнов -  {value_varns}, причина - {reason}\n'
+    for i, (userid, username, value_varns, reason, date_last_varn) in enumerate(varns_info, start=1):
+        response += f'{i}. <a href="tg://user?id={userid}">{username}</a> количество варнов -  {value_varns}, причина - {reason}, дата - {date_last_varn}\n'
     await message.answer(response)
