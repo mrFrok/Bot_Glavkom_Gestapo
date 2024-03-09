@@ -3,5 +3,5 @@ async
 translators
 pyjokes
 pyrogram
-g4f
+g4f==0.2.2.8
 setuptools

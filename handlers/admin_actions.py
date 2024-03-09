@@ -5,7 +5,7 @@ from aiogram.filters import Command
 import time
 from filters import IsAdminFilter
 from db import new_varn_user, get_varn_users, update_varn_user, get_top_varn_users, delete_varn_user, add_user, \
-    get_user_from_name, add_user_if_not_exists, get_user_from_username, get_user
+    get_user_from_name, add_user_if_not_exists, get_user_from_username, get_user, add_restricts, delete_restricts_user
 import re
 from bot import bot, dp
 
@@ -43,6 +43,8 @@ async def ban(message: types.Message):
                         await bot.send_message(message.chat.id,
                                                f' | <b>Решение выдать бан было принято:</b> {name1}\n | <b>Нарушитель:</b> <a href="tg://user?id={muteid}">{mention.group(1)}</a>\n⏰ | <b>Срок наказания:</b> {mutetype}\n | <b>Причина:</b> {comment}',
                                                parse_mode='html')
+                        name = get_user(muteid)[3]
+                        add_restricts(muteid, mention.group(1), name, comment, 'ban', datetime.datetime.now())
                     else:
                         await message.reply(
                             'Не правильно написано!\nНапример:\n`/мут 1 ч причина \n /мут 1 м причина \n /мут 1 д причина \n /мут 1 г причина \n /мут навсегда причина`')
@@ -51,6 +53,8 @@ async def ban(message: types.Message):
                 if mutetype == "ч" or mutetype == "часов" or mutetype == "h":
                     await bot.ban_chat_member(message.chat.id, muteid,
                                               until_date=int(time.time()) + muteint * 3600)
+                    name = get_user(muteid)[3]
+                    add_restricts(muteid, mention.group(1), name, comment, 'ban', datetime.datetime.now())
                     try:
                         await message.delete()
                     except:
@@ -71,6 +75,8 @@ async def ban(message: types.Message):
                 elif mutetype == "д" or mutetype == "дней" or mutetype == "d":
                     await bot.ban_chat_member(message.chat.id, muteid,
                                               until_date=int(time.time()) + muteint * 86400)
+                    name = get_user(muteid)[3]
+                    add_restricts(muteid, mention.group(1), name, comment, 'ban', datetime.datetime.now())
                     try:
                         await message.delete()
                     except:
@@ -81,6 +87,8 @@ async def ban(message: types.Message):
                 elif mutetype == "г" or mutetype == "год" or mutetype == "y" or mutetype == "л" or mutetype == "лет":
                     await bot.ban_chat_member(message.chat.id, muteid,
                                               until_date=int(time.time()) + muteint * 31536000)
+                    name = get_user(muteid)[3]
+                    add_restricts(muteid, mention.group(1), name, comment, 'ban', datetime.datetime.now())
                     try:
                         await message.delete()
                     except:
@@ -108,6 +116,9 @@ async def ban(message: types.Message):
                 'Не правильно написано!\nНапример:\n`/бан 1 м причина \n /бан 1 ч причина \n /бан 1 д причина \n /бан 1 г причина \n /бан навсегда причина `')
         if mutetype == "infinity" or mutetype == "навсегда":
             await bot.ban_chat_member(message.chat.id, message.reply_to_message.from_user.id)
+            name = get_user(message.reply_to_message.from_user.id)[3]
+            add_restricts(message.reply_to_message.from_user.id, message.reply_to_message.from_user.full_name, name,
+                          comment, 'ban', datetime.datetime.now())
             try:
                 await message.delete()
             except:
@@ -122,6 +133,8 @@ async def ban(message: types.Message):
     if mutetype == "ч" or mutetype == "часов" or mutetype == "h":
         await bot.ban_chat_member(message.chat.id, message.reply_to_message.from_user.id,
                                   until_date=int(time.time()) + muteint * 3600)
+        name = get_user(message.reply_to_message.from_user.id)[3]
+        add_restricts(message.reply_to_message.from_user.id, message.reply_to_message.from_user.full_name, name, comment, 'ban', datetime.datetime.now())
         try:
             await bot.delete_message(message.chat.id, message.reply_to_message.message_id)
             await message.delete()
@@ -133,6 +146,8 @@ async def ban(message: types.Message):
     elif mutetype == "м" or mutetype == "минут" or mutetype == "m":
         await bot.ban_chat_member(message.chat.id, message.reply_to_message.from_user.id,
                                   until_date=int(time.time()) + muteint * 60)
+        name = get_user(message.reply_to_message.from_user.id)[3]
+        add_restricts(message.reply_to_message.from_user.id, message.reply_to_message.from_user.full_name, name, comment, 'ban', datetime.datetime.now())
         try:
             await bot.delete_message(message.chat.id, message.reply_to_message.message_id)
             await message.delete()
@@ -144,6 +159,8 @@ async def ban(message: types.Message):
     elif mutetype == "д" or mutetype == "дней" or mutetype == "d":
         await bot.ban_chat_member(message.chat.id, message.reply_to_message.from_user.id,
                                   until_date=int(time.time()) + muteint * 86400)
+        name = get_user(message.reply_to_message.from_user.id)[3]
+        add_restricts(message.reply_to_message.from_user.id, message.reply_to_message.from_user.full_name, name, comment, 'ban', datetime.datetime.now())
         try:
             await bot.delete_message(message.chat.id, message.reply_to_message.message_id)
             await message.delete()
@@ -155,6 +172,8 @@ async def ban(message: types.Message):
     elif mutetype == "г" or mutetype == "год" or mutetype == "y" or mutetype == "л" or mutetype == "лет":
         await bot.ban_chat_member(message.chat.id, message.reply_to_message.from_user.id,
                                   until_date=int(time.time()) + muteint * 31536000)
+        name = get_user(message.reply_to_message.from_user.id)[3]
+        add_restricts(message.reply_to_message.from_user.id, message.reply_to_message.from_user.full_name, name, comment, 'ban', datetime.datetime.now())
         try:
             await bot.delete_message(message.chat.id, message.reply_to_message.message_id)
             await message.delete()
@@ -178,12 +197,14 @@ async def unban(message: types.Message):
                 mutename = get_user(muteid1[0])
                 await message.delete()
                 await message.bot.unban_chat_member(chat_id=message.chat.id, user_id=muteid1[0])
+                delete_restricts_user(muteid1[0])
                 await message.answer(
                     f'Пользователь <a href="tg://user?id={muteid1}">{mutename[2]}</a> разбанен админом {banner}',
                     parse_mode='html')
 
     await message.delete()
     await message.bot.unban_chat_member(chat_id=message.chat.id, user_id=message.reply_to_message.from_user.id)
+    delete_restricts_user(message.reply_to_message.from_user.id)
 
     await message.answer(
         f'Пользователь <a href="tg://user?id={message.reply_to_message.from_user.id}">{message.reply_to_message.from_user.full_name}</a> разбанен админом {banner}',
@@ -220,6 +241,8 @@ async def mute(message: types.Message):
                             await message.delete()
                         except:
                             pass
+                        name = get_user(muteid)[3]
+                        add_restricts(muteid, mention.group(1), name, comment, 'mute', datetime.datetime.now())
                         await bot.send_message(message.chat.id,
                                                f' | <b>Решение выдать мут было принято:</b> {name1}\n | <b>Нарушитель:</b> <a href="tg://user?id={muteid}">{mention.group(1)}</a>\n⏰ | <b>Срок наказания:</b> {mutetype}\n | <b>Причина:</b> {comment}',
                                                parse_mode='html')
@@ -234,6 +257,8 @@ async def mute(message: types.Message):
                                                                                                 can_send_polls=False,
                                                                                                 can_send_other_messages=False,
                                                                                                 can_send_media_messages=False))
+                    name = get_user(muteid)[3]
+                    add_restricts(muteid, mention.group(1), name, comment, 'mute', datetime.datetime.now())
                     await message.bot.send_message(message.chat.id,
                                                    f' | <b>Решение выдать мут было принято:</b> {name1}\n | <b>Нарушитель:</b> <a href="tg://user?id={muteid}">{mention.group(1)}</a>\n⏰ | <b>Срок наказания:</b> {muteint} {mutetype}\n | <b>Причина:</b> {comment}',
                                                    parse_mode='html')
@@ -246,6 +271,8 @@ async def mute(message: types.Message):
                                                                                                 can_send_polls=False,
                                                                                                 can_send_other_messages=False,
                                                                                                 can_send_media_messages=False))
+                    name = get_user(muteid)[3]
+                    add_restricts(muteid, mention.group(1), name, comment, 'mute', datetime.datetime.now())
                     await message.delete()
                     await message.answer(
                         f' | <b>Решение выдать мут было принято:</b> {name1}\n | <b>Нарушитель:</b> <a href="tg://user?id={muteid}">{mention.group(1)}</a>\n⏰ | <b>Срок наказания:</b> {muteint} {mutetype}\n | <b>Причина:</b> {comment}',
@@ -258,6 +285,8 @@ async def mute(message: types.Message):
                                                                                                 can_send_polls=False,
                                                                                                 can_send_other_messages=False,
                                                                                                 can_send_media_messages=False))
+                    name = get_user(muteid)[3]
+                    add_restricts(muteid, mention.group(1), name, comment, 'mute', datetime.datetime.now())
                     await message.delete()
                     await message.answer(
                         f' | <b>Решение выдать мут было принято:</b> {name1}\n | <b>Нарушитель:</b> <a href="tg://user?id={muteid}">{mention.group(1)}</a>\n⏰ | <b>Срок наказания:</b> {muteint} {mutetype}\n | <b>Причина:</b> {comment}',
@@ -270,6 +299,8 @@ async def mute(message: types.Message):
                                                                                                 can_send_polls=False,
                                                                                                 can_send_other_messages=False,
                                                                                                 can_send_media_messages=False))
+                    name = get_user(muteid)[3]
+                    add_restricts(muteid, mention.group(1), name, comment, 'mute', datetime.datetime.now())
                     await message.delete()
                     await message.answer(
                         f' | <b>Решение выдать мут было принято:</b> {name1}\n | <b>Нарушитель:</b> <a href="tg://user?id={muteid}">{mention.group(1)}</a>\n⏰ | <b>Срок наказания:</b> {muteint} {mutetype}\n | <b>Причина:</b> {comment}',
@@ -306,6 +337,8 @@ async def mute(message: types.Message):
                                                                                             can_send_polls=False,
                                                                                             can_send_other_messages=False,
                                                                                             can_send_media_messages=False))
+                name = get_user(message.reply_to_message.from_user.id)[3]
+                add_restricts(message.reply_to_message.from_user.id, message.reply_to_message.from_user.full_name, name, comment, 'mute', datetime.datetime.now())
                 try:
                     await bot.delete_message(message.chat.id, message.reply_to_message.message_id)
                     await message.delete()
@@ -325,6 +358,9 @@ async def mute(message: types.Message):
                                                                                         can_send_polls=False,
                                                                                         can_send_other_messages=False,
                                                                                         can_send_media_messages=False))
+            name = get_user(message.reply_to_message.from_user.id)[3]
+            add_restricts(message.reply_to_message.from_user.id, message.reply_to_message.from_user.full_name, name,
+                          comment, 'mute', datetime.datetime.now())
             try:
                 await bot.delete_message(message.chat.id, message.reply_to_message.message_id)
                 await message.delete()
@@ -341,6 +377,9 @@ async def mute(message: types.Message):
                                                                                         can_send_polls=False,
                                                                                         can_send_other_messages=False,
                                                                                         can_send_media_messages=False))
+            name = get_user(message.reply_to_message.from_user.id)[3]
+            add_restricts(message.reply_to_message.from_user.id, message.reply_to_message.from_user.full_name, name,
+                          comment, 'mute', datetime.datetime.now())
 
             await bot.delete_message(message.chat.id, message.reply_to_message.message_id)
             await message.delete()
@@ -356,6 +395,9 @@ async def mute(message: types.Message):
                                                                                         can_send_polls=False,
                                                                                         can_send_other_messages=False,
                                                                                         can_send_media_messages=False))
+            name = get_user(message.reply_to_message.from_user.id)[3]
+            add_restricts(message.reply_to_message.from_user.id, message.reply_to_message.from_user.full_name, name,
+                          comment, 'mute', datetime.datetime.now())
             try:
                 await bot.delete_message(message.chat.id, message.reply_to_message.message_id)
                 await message.delete()
@@ -372,6 +414,9 @@ async def mute(message: types.Message):
                                                                                         can_send_polls=False,
                                                                                         can_send_other_messages=False,
                                                                                         can_send_media_messages=False))
+            name = get_user(message.reply_to_message.from_user.id)[3]
+            add_restricts(message.reply_to_message.from_user.id, message.reply_to_message.from_user.full_name, name,
+                          comment, 'mute', datetime.datetime.now())
             try:
                 await bot.delete_message(message.chat.id, message.reply_to_message.message_id)
                 await message.delete()
@@ -405,6 +450,7 @@ async def unmute(message):
                                                            can_send_media_messages=True,
                                                            can_invite_users=True,
                                                            can_add_web_page_previews=True))
+                delete_restricts_user(muteid)
                 await message.answer(
                     f'Пользователю <a href="tg://user?id={muteid}">{mention.group(1)}</a> был снят мут админом {mutitel}',
                     parse_mode='html')
@@ -419,6 +465,7 @@ async def unmute(message):
                                                                                             can_send_media_messages=True,
                                                                                             can_invite_users=True,
                                                                                             can_add_web_page_previews=True))
+        delete_restricts_user(message.reply_to_message.from_user.id)
 
         await message.answer(
             f'Пользователю <a href="tg://user?id={message.reply_to_message.from_user.id}">{message.reply_to_message.from_user.full_name}</a> был снят мут админом {mutitel}',

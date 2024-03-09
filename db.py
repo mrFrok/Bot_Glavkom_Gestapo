@@ -51,6 +51,14 @@ def get_user_from_username(username):
     return user
 
 
+def delete_user(userid):
+    conn = sqlite3.connect('database.db')
+    c = conn.cursor()
+    c.execute("DELETE FROM users WHERE userid=?", (userid,))
+    conn.commit()
+    conn.close()
+
+
 def get_user_dick(userid):
     conn = sqlite3.connect('database.db')
     c = conn.cursor()
@@ -58,36 +66,6 @@ def get_user_dick(userid):
     dick = c.fetchone()
     conn.close()
     return dick
-
-
-def add_dick(userid, name, size, last_used):
-    conn = sqlite3.connect('database.db')
-    c = conn.cursor()
-    c.execute('INSERT INTO dicks (userid, name, size, last_used) VALUES (?,?,?,?)',
-              (userid, name, size, last_used))
-    conn.commit()
-    conn.close()
-
-
-def update_dick(size, last_used, userid):
-    conn = sqlite3.connect('database.db')
-    c = conn.cursor()
-    c.execute('UPDATE dicks SET size =?, last_used =? WHERE userid =?',
-              (size, last_used, userid))
-    conn.commit()
-    conn.close()
-
-
-def full_update(userid, username, name):
-    conn = sqlite3.connect('database.db')
-    c = conn.cursor()
-    c.execute("UPDATE users SET username=?, name=? WHERE userid=?", (username, name, userid))
-    c.execute('UPDATE dicks SET name=? WHERE userid =?',
-              (name, userid))
-    c.execute('UPDATE varns SET name=?, username=? WHERE userid = ?', (name, username, userid))
-    # c.execute('UPDATE nedrochabr SET username=? WHERE userid =?', (name, userid))
-    # c.execute('UPDATE reminder SET name=? WHERE userid =?', (name, userid))
-    conn.commit()
 
 
 def update_user(userid, username, name):
@@ -98,10 +76,212 @@ def update_user(userid, username, name):
     conn.close()
 
 
-def delete_user(userid):
+def add_dick(userid, name):
     conn = sqlite3.connect('database.db')
     c = conn.cursor()
-    c.execute("DELETE FROM users WHERE userid=?", (userid,))
+    c.execute("SELECT COUNT(*) FROM dicks WHERE userid = ?", (userid,))
+    user_exists = c.fetchone()[0] > 0
+    if not user_exists:
+        c.execute('INSERT INTO dicks (userid, name) VALUES (?,?)',
+                  (userid, name))
+        c.execute('INSERT INTO dicks_inventory (userid) VALUES (?)', (userid,))
+        conn.commit()
+    conn.close()
+
+
+def update_dick1(size, last_used, userid, object_1):
+    conn = sqlite3.connect('database.db')
+    c = conn.cursor()
+    c.execute('UPDATE dicks SET size =?, last_used =? WHERE userid =?',
+              (size, last_used, userid))
+    c.execute('UPDATE dicks_inventory SET object_1 =? WHERE userid =?', (object_1, userid))
+    conn.commit()
+    conn.close()
+
+
+def update_dick2(size, last_used, userid, object_2):
+    conn = sqlite3.connect('database.db')
+    c = conn.cursor()
+    c.execute('UPDATE dicks SET size =?, last_used =? WHERE userid =?',
+              (size, last_used, userid))
+    c.execute('UPDATE dicks_inventory SET object_2 =? WHERE userid =?', (object_2, userid))
+    conn.commit()
+    conn.close()
+
+
+def update_dick3(size, last_used, userid, object_3):
+    conn = sqlite3.connect('database.db')
+    c = conn.cursor()
+    c.execute('UPDATE dicks SET size =?, last_used =? WHERE userid =?',
+              (size, last_used, userid))
+    c.execute('UPDATE dicks_inventory SET object_3 =? WHERE userid =?', (object_3, userid))
+    conn.commit()
+    conn.close()
+
+
+def update_last_worked(userid, worked):
+    conn = sqlite3.connect('database.db')
+    c = conn.cursor()
+    c.execute('UPDATE dicks SET last_worked =? WHERE userid =?',
+              (worked, userid))
+    conn.commit()
+    conn.close()
+
+
+def get_work_level(userid):
+    conn = sqlite3.connect('database.db')
+    c = conn.cursor()
+    c.execute('SELECT work_level FROM dicks WHERE userid = ?', (userid,))
+    work = c.fetchone()
+    conn.close()
+    return work
+
+
+def get_work_use(userid):
+    conn = sqlite3.connect('database.db')
+    c = conn.cursor()
+    c.execute('SELECT work_used FROM dicks WHERE userid = ?', (userid,))
+    work = c.fetchone()
+    conn.close()
+    return work
+
+
+def update_work_use(userid, work):
+    conn = sqlite3.connect('database.db')
+    c = conn.cursor()
+    c.execute('UPDATE dicks SET work_used =? WHERE userid =?',
+              (work, userid))
+    conn.commit()
+    conn.close()
+
+
+def get_last_worked(userid):
+    conn = sqlite3.connect('database.db')
+    c = conn.cursor()
+    c.execute('SELECT last_worked FROM dicks WHERE userid = ?', (userid,))
+    work = c.fetchone()
+    conn.close()
+    return work
+
+
+def update_work_level(userid, work):
+    conn = sqlite3.connect('database.db')
+    c = conn.cursor()
+    c.execute('UPDATE dicks SET work_level =? WHERE userid =?',
+              (work, userid))
+    conn.commit()
+    conn.close()
+
+
+def update_money(userid, money):
+    conn = sqlite3.connect('database.db')
+    c = conn.cursor()
+    c.execute('UPDATE dicks_inventory SET money =? WHERE userid =?',
+              (money, userid))
+    conn.commit()
+    conn.close()
+
+
+def get_money(userid):
+    conn = sqlite3.connect('database.db')
+    c = conn.cursor()
+    c.execute('SELECT money FROM dicks_inventory WHERE userid = ?', (userid,))
+    money = c.fetchone()
+    conn.close()
+    return money
+
+
+def get_objects(userid):
+    conn = sqlite3.connect('database.db')
+    c = conn.cursor()
+    c.execute('SELECT object_1, object_2, object_3 FROM dicks_inventory WHERE userid = ?', (userid,))
+    objects = c.fetchone()
+    conn.close()
+    return objects
+
+
+def get_medicine(userid):
+    conn = sqlite3.connect('database.db')
+    c = conn.cursor()
+    c.execute('SELECT medicine FROM dicks_inventory WHERE userid = ?', (userid,))
+    medicine = c.fetchone()
+    conn.close()
+    return medicine
+
+
+def get_inventory(userid):
+    conn = sqlite3.connect('database.db')
+    c = conn.cursor()
+    c.execute('SELECT object_1, object_2, object_3, medicine FROM dicks_inventory WHERE userid = ?', (userid,))
+    inventory = c.fetchone()
+    conn.close()
+    return inventory
+
+
+def update_object1(userid, object_1, money):
+    conn = sqlite3.connect('database.db')
+    c = conn.cursor()
+    c.execute('UPDATE dicks_inventory SET money =? WHERE userid =?', (money, userid))
+    c.execute('UPDATE dicks_inventory SET object_1 =? WHERE userid =?',
+              (object_1, userid))
+    conn.commit()
+    conn.close()
+
+
+def update_object2(userid, object_2, money):
+    conn = sqlite3.connect('database.db')
+    c = conn.cursor()
+    c.execute('UPDATE dicks_inventory SET money =? WHERE userid =?', (money, userid))
+    c.execute('UPDATE dicks_inventory SET object_2 =? WHERE userid =?',
+              (object_2, userid))
+    conn.commit()
+    conn.close()
+
+
+def update_object3(userid, object_3, money):
+    conn = sqlite3.connect('database.db')
+    c = conn.cursor()
+    c.execute('UPDATE dicks_inventory SET money =? WHERE userid =?', (money, userid))
+    c.execute('UPDATE dicks_inventory SET object_3 =? WHERE userid =?',
+              (object_3, userid))
+    conn.commit()
+    conn.close()
+
+
+def update_medicine(userid, medicine, money):
+    conn = sqlite3.connect('database.db')
+    c = conn.cursor()
+    c.execute('UPDATE dicks_inventory SET money =? WHERE userid =?', (money, userid))
+    c.execute('UPDATE dicks_inventory SET medicine =? WHERE userid =?',
+              (medicine, userid))
+    conn.commit()
+    conn.close()
+
+
+def get_sick(userid):
+    conn = sqlite3.connect('database.db')
+    c = conn.cursor()
+    c.execute('SELECT is_sick FROM dicks WHERE userid = ?', (userid,))
+    sick = c.fetchone()
+    conn.close()
+    return sick
+
+
+def update_sick(userid, sick):
+    conn = sqlite3.connect('database.db')
+    c = conn.cursor()
+    c.execute('UPDATE dicks SET is_sick =? WHERE userid =?',
+              (sick, userid))
+    conn.commit()
+    conn.close()
+
+
+def heal_sick(userid, sick, medicine):
+    conn = sqlite3.connect('database.db')
+    c = conn.cursor()
+    c.execute('UPDATE dicks SET is_sick =? WHERE userid =?',
+              (sick, userid))
+    c.execute('UPDATE dicks_inventory SET medicine =? WHERE userid =?', )
     conn.commit()
     conn.close()
 
@@ -113,6 +293,27 @@ def get_top_dicks():
     top_users = c.fetchall()
     conn.close()
     return top_users
+
+
+def decrease_dick(userid, size):
+    conn = sqlite3.connect('database.db')
+    c = conn.cursor()
+    c.execute('UPDATE dicks SET size =? WHERE userid =?',
+              (size, userid))
+    conn.commit()
+    conn.close()
+
+
+def full_update(userid, username, name):
+    conn = sqlite3.connect('database.db')
+    c = conn.cursor()
+    c.execute("UPDATE users SET username=?, name=? WHERE userid=?", (username, name, userid))
+    c.execute('UPDATE dicks SET name=? WHERE userid =?',
+              (name, userid))
+    c.execute('UPDATE varns SET name=?, username=? WHERE userid = ?', (name, username, userid))
+    c.execute('UPDATE restricts SET name=?, username=? WHERE userid = ?', (name, username, userid))
+    c.execute('UPDATE reputations SET name=?, username=? WHERE userid = ?', (name, username, userid))
+    conn.commit()
 
 
 def new_varn_user(userid, username, varns, reason, date_last_varn):
@@ -247,3 +448,116 @@ def get_reminders():
     c.execute('SELECT userid FROM reminder')
     users = c.fetchall()
     return users
+
+
+def add_restricts(userid, username, name, reason_restrict, type_restrict, date_restrict):
+    conn = sqlite3.connect('database.db')
+    c = conn.cursor()
+    c.execute(
+        'INSERT INTO restricts (userid, username, name, reason_restrict, type_restrict, date_restrict) VALUES (?, ?, ?, ?, ?, ?)',
+        (userid, username, name, reason_restrict, type_restrict, date_restrict))
+    conn.commit()
+    conn.close()
+
+
+def get_user_restricts(userid):
+    conn = sqlite3.connect('database.db')
+    c = conn.cursor()
+    c.execute('SELECT * FROM restricts WHERE userid=?', (userid,))
+    user = c.fetchall()
+    conn.close()
+    return user
+
+
+def get_user_restricts_for_two_weeks(userid):
+    from datetime import datetime, timedelta
+    conn = sqlite3.connect('database.db')
+    c = conn.cursor()
+    two_weeks_ago = datetime.now() - timedelta(weeks=2)
+    c.execute(
+        'SELECT type_restrict, reason_restrict, date_restrict FROM restricts WHERE userid=? AND date_restrict >= ?',
+        (userid, two_weeks_ago))
+    user = c.fetchall()
+    conn.close()
+    return user
+
+
+def add_reputation_if_not_exists(userid, username, name, reputation):
+    conn = sqlite3.connect('database.db')
+    c = conn.cursor()
+    c.execute("SELECT COUNT(*) FROM reputations WHERE userid = ?", (userid,))
+    user_exists = c.fetchone()[0] > 0
+    if not user_exists:
+        c.execute(
+            'INSERT INTO reputations (userid, username, name, reputation) VALUES (?, ?, ?, ?)',
+            (userid, username, name, reputation))
+        conn.commit()
+
+    conn.close()
+
+
+def get_user_reputation(userid):
+    conn = sqlite3.connect('database.db')
+    c = conn.cursor()
+    c.execute('SELECT reputation FROM reputations WHERE userid=?', (userid,))
+    user = c.fetchone()
+    conn.close()
+    return user
+
+
+def get_top_reputation():
+    conn = sqlite3.connect('database.db')
+    c = conn.cursor()
+    c.execute('SELECT userid, name, reputation FROM reputations ORDER BY reputation DESC LIMIT 10')
+    user = c.fetchall()
+    conn.close()
+    return user
+
+
+def update_reputation(userid, reputaion):
+    conn = sqlite3.connect('database.db')
+    c = conn.cursor()
+    c.execute('UPDATE reputations SET reputation = ? WHERE userid =?', (reputaion, userid))
+    conn.commit()
+    conn.close()
+
+
+def get_last_use_reputation(userid):
+    conn = sqlite3.connect('database.db')
+    c = conn.cursor()
+    c.execute('SELECT last_use FROM reputations WHERE userid=?', (userid,))
+    user = c.fetchone()
+    conn.close()
+    return user
+
+
+def update_last_use_reputation(userid, last_use):
+    conn = sqlite3.connect('database.db')
+    c = conn.cursor()
+    c.execute('UPDATE reputations SET last_use = ? WHERE userid =?', (last_use, userid))
+    conn.commit()
+    conn.close()
+
+
+def delete_restricts_user(userid):
+    conn = sqlite3.connect('database.db')
+    c = conn.cursor()
+    c.execute('DELETE FROM restricts WHERE userid=?', (userid,))
+    conn.commit()
+    conn.close()
+
+
+def update_about(userid, about):
+    conn = sqlite3.connect('database.db')
+    c = conn.cursor()
+    c.execute('UPDATE users SET about = ? WHERE userid =?', (about, userid))
+    conn.commit()
+    conn.close()
+
+def get_about(userid):
+    conn = sqlite3.connect('database.db')
+    c = conn.cursor()
+    c.execute('SELECT about FROM users WHERE userid=?', (userid,))
+    user = c.fetchone()
+    conn.close()
+    return user

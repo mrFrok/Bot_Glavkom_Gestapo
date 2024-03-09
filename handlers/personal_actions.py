@@ -9,7 +9,6 @@ import g4f
 import pyjokes as pyjoke
 import translators as ts
 
-
 router = Router()
 
 
@@ -66,7 +65,18 @@ async def help(message: types.Message):
                          f'!кто - кто из участников \n'
                          f'!дпбд(Только для админов) - добавить всех пользователей в базу данных \n'
                          f'!ситх - получить рандомного ситха\n'
-                         f'!джедай - получить рандомного джедая')
+                         f'!джедай - получить рандомного джедая\n'
+                         f'!св - созвать всех\n'
+                         f'!тр - получить 10 человек с самой высокой репутацией\n'
+                         f'!работать - поработать, чтобы получить деньги\n'
+                         f'!магазин - посмотреть доступные для покупки товары\n'
+                         f'!купить - купить товар в магазине\n'
+                         f'!биография - заполнить/посмотреть биографию\n'
+                         f'!лечиться - вылечить заболевание\n'
+                         f'!дело(Только для админов) - посмотреть все наказания за 2 недели у пользователя\n'
+                         f'!инвентарь - посмотреть инвентарь\n'
+                         f'!баланс - посмотреть баланс\n'
+                         f'!повышение - получить повышение на работе')
 
 
 @router.message(Command('анекдот', prefix='!'))
@@ -76,27 +86,8 @@ async def random_joke(message: types.Message):
     await message.answer(joke)
 
 
-@router.message(Command('реп', prefix='+'))
-async def rep(message: types.Message):
-    name1 = message.from_user.mention_html()
-    if not message.reply_to_message:
-        await message.answer(f"{name1} оказывает всем уважение")
-    else:
-        await message.answer(
-            f'{name1} оказывает уважение <a href="tg://user?id={message.reply_to_message.from_user.id}">{message.reply_to_message.from_user.full_name}</a>')
-
-
-@router.message(Command('реп', prefix='-'))
-async def rep_min(message: types.Message):
-    name1 = message.from_user.mention_html()
-    if not message.reply_to_message:
-        await message.answer(f"{name1} неуважает всех")
-    else:
-        await message.answer(
-            f'{name1} неуважает <a href="tg://user?id={message.reply_to_message.from_user.id}">{message.reply_to_message.from_user.full_name}</a>')
-
-
-@router.message(Command('бомбить', 'Бомбить', ' бомбить', ' Бомбить', 'омбить', 'разбомбить', 'азбомбить', prefix='!бБрР'))
+@router.message(
+    Command('бомбить', 'Бомбить', ' бомбить', ' Бомбить', 'омбить', 'разбомбить', 'азбомбить', prefix='!бБрР'))
 async def bomb(message: types.Message):
     bomb = message.from_user.mention_html()
     if not message.reply_to_message:
@@ -451,7 +442,7 @@ async def mob(message: types.Message):
 
 
 @router.message(Command('Сосать', 'сосать', 'осать', 'оснуть', 'Соснуть', 'соснуть', 'отсосать', 'тсосать', 'Отсосать',
-    prefix='!СсОо'))
+                        prefix='!СсОо'))
 async def sosat(message: types.Message):
     name1 = message.from_user.mention_html()
     if not message.reply_to_message:
@@ -492,17 +483,17 @@ async def gpt4(message: types.Message):
             await message.reply(
                 'Произошла ошибка. Возможно, у вас слишком большое сообщение, попробуйте написать короче')
 
+
 async def askgpt(messagess, provider: g4f.Provider.base_provider):
     try:
         response = await g4f.ChatCompletion.create_async(
-        model=g4f.models.gpt_4,
-        messages=messagess,
-        provider=provider
+            model=g4f.models.gpt_4,
+            messages=messagess,
+            provider=provider
         )
         return response
     except:
         pass
-
 
 
 @router.message(Command('техника', 'Техника', 'ехника', prefix='!тТ'))
@@ -562,6 +553,7 @@ async def danet(message: types.Message):
     else:
         await message.reply('а?')
 
+
 @router.message(Command('Джедай', 'джедай', prefix='!'))
 async def jedi(message: types.Message):
     lists = os.listdir('jedi')
@@ -582,6 +574,7 @@ async def jedi(message: types.Message):
     elif picture == '5.jpg':
         await message.bot.send_photo(chat_id=message.chat.id, photo=photo,
                                      caption='Энакин Скайуокер— легендарный чувствительный к силе человек, который служил Галактической Республике как рыцарь-джедай, позже служивший Галактической Империи и командовавший её войсками, как Лорд Ситхов Дарт Вейдер. Рождённый Шми Скайуокер, в юности стал тайным мужем сенатора с Набу, Падмэ Амидалы. Он был отцом гранд-мастера Люка Скайуокера, Леи Органы-Соло и дедом Бена Скайуокера.«Ты был Избранником! Предрекали, что ты уничтожишь ситхов, а не примкнёшь к ним! Восстановишь равновесие Силы, а не ввергнешь её во мрак!»―Оби-Ван Кеноби полумертвому Энакину Скайуокеру после дуэли на Мустафаре.')
+
 
 @router.message(Command('Ситх', 'ситх', prefix='!'))
 async def sith(message: types.Message):

@@ -5,13 +5,21 @@ from bot import dp, bot
 from aiogram.types import Message
 from random import randint, choice
 import config
-from db import add_user, update_user, update_dick, get_user, get_top_dicks, get_users, delete_user, \
+from db import add_user, update_user, update_dick1, update_dick2, update_dick3, get_user, get_top_dicks, get_users, \
+    delete_user, \
     add_user_if_not_exists, add_dick, get_user_dick, full_update, add_user_nedr, update_user_nedr, get_status_nedr, \
     get_users_nedr, \
-    get_user_nedr, check_reminder, new_reminder, update_reminder, delete_reminder
+    get_user_nedr, check_reminder, new_reminder, update_reminder, delete_reminder, get_user_restricts, \
+    get_user_from_username, get_user_restricts_for_two_weeks, add_reputation_if_not_exists, get_user_reputation, \
+    get_top_reputation, \
+    update_reputation, get_last_use_reputation, update_last_use_reputation, get_work_level, get_work_use, \
+    update_work_use, update_work_level, update_sick, heal_sick, get_objects, update_object1, update_object2, \
+    update_object3, update_medicine, get_last_worked, update_money, update_last_worked, get_money, get_inventory, \
+    get_medicine, get_sick, decrease_dick, update_about, get_about
 import datetime
 from pyrogram_config import get_chat_members_id, get_chat_members_name, get_chat_members_username
 from filters import IsAdminFilter
+import re
 
 router = Router()
 
@@ -35,39 +43,251 @@ async def start(message: types.Message):
         await message.reply('Вы уже есть в базе данных!')
 
 
+@router.message(Command('работать', 'Работать', prefix='!'))
+async def work(message: types.Message):
+    add_dick(message.from_user.id, message.from_user.full_name)
+    date_worked = get_last_worked(message.from_user.id)[0]
+    if datetime.datetime.now() - datetime.datetime.strptime(date_worked, '%Y-%m-%d %H:%M:%S.%f') > datetime.timedelta(
+            hours=24):
+        if datetime.datetime.now() - datetime.datetime.strptime(date_worked,
+                                                                '%Y-%m-%d %H:%M:%S.%f') > datetime.timedelta(days=7):
+            update_work_use(message.from_user.id, 0)
+            await message.reply(
+                'Начальник удалил вам все отработанные дни, так как вас не было на работе уже больше недели! В следующий раз старайтесь меньше прогуливать работу!')
+        is_sick = get_sick(message.from_user.id)[0]
+        if is_sick == 1:
+            prime_chance = random.random()
+            if prime_chance < 0.2:
+                money_old = get_money(message.from_user.id)[0]
+                money = randint(10, 20)
+                update_money(message.from_user.id, money_old + money)
+                await message.reply(f'За ваше усердие на работе начальник выписал вам премию в {money} монет')
+            days = (datetime.datetime.now() - datetime.datetime.strptime(date_worked, '%Y-%m-%d %H:%M:%S.%f')).days
+            minus = days * 2
+            decrease_dick(message.from_user.id, get_user_dick(message.from_user.id)[3] - minus)
+            await message.reply(
+                f'Ваш хуй уменьшился на {minus} см из-за того, что вы больны! Вылечитесь как можно быстрее! Сейчас ваш хуй равен {get_user_dick(message.from_user.id)[3]} см')
+            level = get_work_level(message.from_user.id)[0]
+            if level == 1:
+                money_old = get_money(message.from_user.id)[0]
+                money = randint(10, 20)
+                update_work_use(message.from_user.id, get_work_use(message.from_user.id)[0] + 1)
+                update_last_worked(message.from_user.id, datetime.datetime.now())
+                update_money(message.from_user.id, money_old + money)
+                await message.reply(
+                    f'Вы заработали {money} монет. Сейчас вы отработали {get_work_use(message.from_user.id)[0]} раз')
+            elif level == 2:
+                money_old = get_money(message.from_user.id)[0]
+                money = randint(20, 40)
+                update_work_use(message.from_user.id, get_work_use(message.from_user.id)[0] + 1)
+                update_last_worked(message.from_user.id, datetime.datetime.now())
+                update_money(message.from_user.id, money_old + money)
+                await message.reply(
+                    f'Вы заработали {money} монет. Сейчас вы отработали {get_work_use(message.from_user.id)[0]} раз')
+            elif level == 3:
+                money_old = get_money(message.from_user.id)[0]
+                money = randint(40, 80)
+                update_work_use(message.from_user.id, get_work_use(message.from_user.id)[0] + 1)
+                update_last_worked(message.from_user.id, datetime.datetime.now())
+                update_money(message.from_user.id, money_old + money)
+                await message.reply(
+                    f'Вы заработали {money} монет. Сейчас вы отработали {get_work_use(message.from_user.id)[0]} раз')
+            else:
+                await message.reply('Ошибка какая то :)')
+        else:
+            prime_chance = random.random()
+            if prime_chance < 0.2:
+                money_old = get_money(message.from_user.id)[0]
+                money = randint(10, 20)
+                update_money(message.from_user.id, money_old + money)
+                await message.reply(f'За ваше усердие на работе начальник выписал вам премию в {money} монет')
+            randoms = random.random()
+            if randoms < 0.07:
+                update_sick(message.from_user.id, 1)
+                await message.reply(
+                    'Вы работали слишком усердно, и подхватили болезнь! Теперь ваш хуй будет уменьшаться каждый день на 2 см, и вы не сможете увеличивать хуй! Вылечитесь как можно быстрее!')
+            level = get_work_level(message.from_user.id)[0]
+            if level == 1:
+                money_old = get_money(message.from_user.id)[0]
+                money = randint(10, 20)
+                update_work_use(message.from_user.id, get_work_use(message.from_user.id)[0] + 1)
+                update_last_worked(message.from_user.id, datetime.datetime.now())
+                update_money(message.from_user.id, money_old + money)
+                await message.reply(
+                    f'Вы заработали {money} монет. Сейчас вы отработали {get_work_use(message.from_user.id)[0]} раз')
+            elif level == 2:
+                money_old = get_money(message.from_user.id)[0]
+                money = randint(20, 40)
+                update_work_use(message.from_user.id, get_work_use(message.from_user.id)[0] + 1)
+                update_last_worked(message.from_user.id, datetime.datetime.now())
+                update_money(message.from_user.id, money_old + money)
+                await message.reply(
+                    f'Вы заработали {money} монет. Сейчас вы отработали {get_work_use(message.from_user.id)[0]} раз')
+            elif level == 3:
+                money_old = get_money(message.from_user.id)[0]
+                money = randint(40, 80)
+                update_work_use(message.from_user.id, get_work_use(message.from_user.id)[0] + 1)
+                update_last_worked(message.from_user.id, datetime.datetime.now())
+                update_money(message.from_user.id, money_old + money)
+                await message.reply(
+                    f'Вы заработали {money} монет. Сейчас вы отработали {get_work_use(message.from_user.id)[0]} раз')
+            else:
+                await message.reply('Ошибка какая то :)')
+    else:
+        time_since_last_use = datetime.datetime.now() - datetime.datetime.strptime(date_worked, '%Y-%m-%d %H:%M:%S.%f')
+        time_since_last_use = time_since_last_use - datetime.timedelta(
+            microseconds=time_since_last_use.microseconds)
+        time_until_next_use = datetime.timedelta(hours=24) - time_since_last_use
+        await message.reply(
+            f'Вы уже работали сегодня, возвращайтесь через {time_until_next_use}!')
+
+
+@router.message(Command('повышение', 'Повышение', prefix='!'))
+async def upgrade(message: types.Message):
+    level = get_work_level(message.from_user.id)[0]
+    work_hours = get_work_use(message.from_user.id)[0]
+    if level == 1:
+        if work_hours >= 14:
+            update_work_level(message.from_user.id, 2)
+            update_work_use(message.from_user.id, 0)
+            await message.reply(
+                'Вы получили повышение! Теперь вы на 2 уровне! Чтобы получить повышение, вам нужно проработать 30 дней')
+        else:
+            await message.reply(f'Чтобы получить повышение, вам нужно проработать ещё {14 - work_hours} дней!')
+    elif level == 2:
+        if work_hours >= 30:
+            update_work_level(message.from_user.id, 3)
+            update_work_use(message.from_user.id, 0)
+            await message.reply(
+                'Вы получили повышение! Теперь вы на 3 уровне! Больше повысить уровень нельзя!')
+        else:
+            await message.reply(f'Чтобы получить повышение, вам нужно проработать ещё {30 - work_hours} дней!')
+    else:
+        await message.reply('Вы уже на 3 уровне!')
+
+
+@router.message(Command('лечиться', 'Лечиться', prefix='!'))
+async def heal(message: types.Message):
+    medecine = get_medicine(message.from_user.id)[0]
+    is_sick = get_sick(message.from_user.id)[0]
+    if is_sick == 1:
+        if medecine > 0:
+            update_sick(message.from_user.id, medecine - 1)
+            await message.reply('Вы вылечились!')
+        else:
+            await message.reply('У вас нет лекарств!')
+    else:
+        await message.reply('Вы здоровы!')
+
+
+@router.message(Command('магазин', 'Магазин', prefix='!'))
+async def shop(message: types.Message):
+    await message.reply('Доступные товары:\n'
+                        'Сода(1 уровень) - 10 монет\n'
+                        'Настойка(2 уровень) - 40 монет\n'
+                        'Европейский препарат(3 уровень) - 80 монет(Чтобы купить, пишите просто препарат))\n'
+                        'Лекарство от болезни - 300 монет\n'
+                        'Чтобы купить товар напишите "!купить название_товара количество_товара"(без надписей в скобках)')
+
+
+@router.message(Command('монеты', 'Монеты', 'баланс', 'Баланс', prefix='!'))
+async def money(message: types.Message):
+    await message.reply(f'Ваш баланс составляет {get_money(message.from_user.id)[0]} монет')
+
+
+@router.message(Command('купить', 'Купить', prefix='!'))
+async def buy(message: types.Message):
+    try:
+        money = get_money(message.from_user.id)[0]
+        product = message.text.split()[1]
+        count = int(message.text.split()[2])
+        if product.lower() == 'сода':
+            if money >= 10 * count:
+                update_object1(message.from_user.id, get_objects(message.from_user.id)[0] + 1, money - 10 * count)
+                await message.reply(f'Вы купили {count} соды')
+            else:
+                await message.reply('Недостаточно монет!')
+        elif product.lower() == 'настойка':
+            if money >= 40 * count:
+                update_object2(message.from_user.id, get_objects(message.from_user.id)[1] + 1, money - 40 * count)
+                await message.reply(f'Вы купили {count} настойки')
+            else:
+                await message.reply('Недостаточно монет!')
+        elif product.lower() == 'препарат':
+            if money >= 80 * count:
+                update_object3(message.from_user.id, get_objects(message.from_user.id)[2] + 1, money - 80 * count)
+                await message.reply(f'Вы купили {count} европейских препаратов')
+            else:
+                await message.reply('Недостаточно монет!')
+        elif product.lower() == 'лекарство':
+            if money >= 300 * count:
+                update_medicine(message.from_user.id, get_medicine(message.from_user.id)[0] + 1, money - 300 * count)
+                await message.reply(f'Вы купили {count} лекарства от болезни')
+            else:
+                await message.reply('Недостаточно монет!')
+        else:
+            await message.reply('Такого товара нет!')
+    except:
+        await message.reply(
+            'Неверно введено! Введите "!купить название_товара количество_товара"(без надписей в скобках)')
+
+
+@router.message(Command('Инвентарь', 'инвентарь', prefix='!'))
+async def inventory(message: types.Message):
+    inventory = get_inventory(message.from_user.id)
+    await message.reply(f'Ваш инвентарь:\n'
+                        f'Сода: {inventory[0]} штук\n'
+                        f'Настойка: {inventory[1]} штук\n'
+                        f'Европейский препарат: {inventory[2]} штук\n'
+                        f'Лекарство от болезни: {inventory[3]} штук')
+
+
 @router.message(Command('писька', 'хуй', prefix='!'))
 async def dick(message: types.Message):
-    last_used = datetime.datetime.now()
+    now = datetime.datetime.now()
     userid = message.from_user.id
     a = get_user_dick(userid)
     if int(message.chat.id) - int(config.GROUP_ID) != 0:
         await message.reply('Вы не состоите в группе!')
-    elif a is None:
-        size = randint(-3, 10)
-        name = message.from_user.full_name
-        add_dick(userid, name, size, last_used)
-        await message.reply(f'Ваш размер хуя теперь равен {size} см')
-    else:
-        size = randint(-10, 20)
-        if last_used - datetime.datetime.strptime(a[4], '%Y-%m-%d %H:%M:%S.%f') > datetime.timedelta(hours=24):
-            if a[3] > a[3] + size:
-                update_dick(a[3] + size, last_used, userid)
-                await message.reply(
-                    f'Ваш хуй уменьшился на {size} см, теперь он равен {a[3] + size} см')
-            elif a[3] < a[3] + size:
-                update_dick(a[3] + size, last_used, userid)
-                await message.reply(
-                    f'Ваш хуй увеличился на {size} см, теперь он равен {a[3] + size} см')
-            else:
-                update_dick(a[3] + size, last_used, userid)
-                await message.reply(f'Ваш хуй не изменился, сейчас он равен {a[3]} см')
-        else:
-            time_since_last_use = last_used - datetime.datetime.strptime(a[4], '%Y-%m-%d %H:%M:%S.%f')
+    try:
+        medication = message.text.split()[1]
+        if now - datetime.datetime.strptime(a[5], '%Y-%m-%d %H:%M:%S.%f') < datetime.timedelta(hours=24):
+            time_since_last_use = now - datetime.datetime.strptime(a[5], '%Y-%m-%d %H:%M:%S.%f')
             time_since_last_use = time_since_last_use - datetime.timedelta(
                 microseconds=time_since_last_use.microseconds)
             time_until_next_use = datetime.timedelta(hours=24) - time_since_last_use
             await message.reply(
                 f'Вы уже пытались вырастить хуй сегодня, возвращайтесь через {time_until_next_use}! Сейчас ваш хуй равен {a[3]} см')
+        else:
+            if a is None:
+                add_dick(message.from_user.id, message.from_user.full_name)
+                await message.reply('Вы не можете увеличить хуй, не имея увеличителя!')
+            else:
+                if medication.lower() == 'сода':
+                    if get_objects(userid)[0] == 1:
+                        size = randint(1, 10)
+                        update_dick1(a[3] + size, now, userid, get_objects(userid)[0] - 1)
+                        await message.reply(f'Ваш хуй увеличился на {size} см, теперь он равен {a[3] + size} см')
+                    else:
+                        await message.reply('У вас нет соды!')
+                elif medication.lower() == 'настойка':
+                    if get_objects(userid)[1] == 1:
+                        size = randint(5, 20)
+                        update_dick2(a[3] + size, now, userid, get_objects(userid)[1] - 1)
+                        await message.reply(f'Ваш хуй увеличился на {size} см, теперь он равен {a[3] + size} см')
+                    else:
+                        await message.reply('У вас нет настойки!')
+                elif medication.lower() == 'препарат':
+                    if get_objects(userid)[2] == 1:
+                        size = randint(10, 40)
+                        update_dick1(a[3] + size, now, userid, get_objects(userid)[2] - 1)
+                        await message.reply(f'Ваш хуй увеличился на {size} см, теперь он равен {a[3] + size} см')
+                    else:
+                        await message.reply('У вас нет европейского препарата!')
+                else:
+                    await message.reply('Такого увеличителя нет!')
+    except:
+        await message.reply('Неверно введено! Введите "!хуй название_увеличителя"(без надписей в скобках)')
 
 
 @router.message(Command('топ_хуев', 'тх', prefix='!'))
@@ -159,6 +379,117 @@ async def dobbd(message: types.Message):
             added_users_count += 1
 
     await message.reply(f'Добавлено {added_users_count} пользователей')
+
+
+@router.message(Command('дело', 'Дело', prefix='!/'), IsAdminFilter(is_admin=True))
+async def case(message: types.Message):
+    mention = re.search(r'@(\w+)', message.text)
+    if mention:
+        try:
+            mention = mention.group(1)
+            personal = get_user_from_username(mention)[0]
+            personally_case = get_user_restricts_for_two_weeks(personal)
+            response = 'Все нарушения пользователя за 2 недели: \n'
+            for z in personally_case:
+                for i, (x, y, m) in enumerate([z], start=1):
+                    response += f'{i}. Тип наказания: {x}, Причина наказания: {y}, Дата наказания: {m}\n'
+            await message.reply(response)
+        except:
+            await message.reply('Пользователь чист')
+
+
+@router.message(Command('реп', prefix='+'))
+async def rep(message: types.Message):
+    if message.from_user.id != message.reply_to_message.from_user.id:
+        add_reputation_if_not_exists(message.from_user.id, message.from_user.username, message.from_user.full_name, 0)
+        add_reputation_if_not_exists(message.reply_to_message.from_user.id, message.reply_to_message.from_user.username,
+                                     message.reply_to_message.from_user.full_name, 0)
+        last_used = get_last_use_reputation(message.from_user.id)[0]
+        if (datetime.datetime.now() - datetime.datetime.strptime(last_used,
+                                                                 '%Y-%m-%d %H:%M:%S.%f')) >= datetime.timedelta(
+            hours=3):
+            rep_old = get_user_reputation(message.from_user.id)[0]
+            rep = rep_old + 1
+            update_reputation(message.reply_to_message.from_user.id, rep)
+            update_last_use_reputation(message.from_user.id, datetime.datetime.now())
+            await message.answer(
+                f'{message.from_user.mention_html()} оказывает уважение <a href="tg://user?id={message.reply_to_message.from_user.id}">{message.reply_to_message.from_user.full_name}</a> (+1)')
+        else:
+            time_since_last_use = datetime.datetime.now() - datetime.datetime.strptime(last_used,
+                                                                                       '%Y-%m-%d %H:%M:%S.%f')
+            time_since_last_use = time_since_last_use - datetime.timedelta(
+                microseconds=time_since_last_use.microseconds)
+            time_until_next_use = datetime.timedelta(hours=3) - time_since_last_use
+            await message.answer(f'Вы уже оказывали уважение! Возвращайстесь через {time_until_next_use}')
+    else:
+        await message.answer('Нельзя оказывать уважение самому себе')
+
+
+@router.message(Command('реп', prefix='-'))
+async def rep_min(message: types.Message):
+    if message.from_user.id != message.reply_to_message.from_user.id:
+        add_reputation_if_not_exists(message.from_user.id, message.from_user.username, message.from_user.full_name, 0)
+        add_reputation_if_not_exists(message.reply_to_message.from_user.id, message.reply_to_message.from_user.username,
+                                     message.reply_to_message.from_user.full_name, 0)
+        last_used = get_last_use_reputation(message.from_user.id)[0]
+        if (datetime.datetime.now() - datetime.datetime.strptime(last_used,
+                                                                 '%Y-%m-%d %H:%M:%S.%f')) >= datetime.timedelta(
+            hours=3):
+            rep_old = get_user_reputation(message.from_user.id)[0]
+            rep = rep_old - 1
+            update_reputation(message.reply_to_message.from_user.id, rep)
+            update_last_use_reputation(message.from_user.id, datetime.datetime.now())
+            await message.answer(
+                f'{message.from_user.mention_html()} оказывает уважение <a href="tg://user?id={message.reply_to_message.from_user.id}">{message.reply_to_message.from_user.full_name}</a> (-1)')
+        else:
+            time_since_last_use = datetime.datetime.now() - datetime.datetime.strptime(last_used,
+                                                                                       '%Y-%m-%d %H:%M:%S.%f')
+            time_since_last_use = time_since_last_use - datetime.timedelta(
+                microseconds=time_since_last_use.microseconds)
+            time_until_next_use = datetime.timedelta(hours=3) - time_since_last_use
+            await message.answer(f'Вы уже оказывали уважение! Возвращайстесь через {time_until_next_use}')
+    else:
+        await message.answer('Нельзя оказывать уважение самому себе')
+
+
+@router.message(Command('топ_реп', 'тр', prefix='!'))
+async def top_rep(message: types.Message):
+    top_rep = get_top_reputation()
+    response = 'Топ-10 репутации:\n'
+    for x in top_rep:
+        for i, (userid, name, reputation) in enumerate([x], start=1):
+            response += f'{i}. <a href="tg://user?id={userid}">{name}</a> ({reputation})\n'
+    await message.answer(response)
+
+
+@router.message(Command('биография', 'Биография', prefix='!'))
+async def about_user(message: types.Message):
+    try:
+        messages = message.text.split()[1]
+        if messages.lower() == 'заполнить':
+            try:
+                about = message.text.split()[2:]
+                about = ' '.join(about)
+                if about == '':
+                    await message.answer('Вы не указали биографию! Напишите "!биография заполнить ваша_биография"')
+                    return
+                update_about(message.from_user.id, about)
+                await message.answer('Ваша биография была успешно заполнена!')
+            except:
+                await message.answer('Вы не указали биографию! Напишите "!биография заполнить ваша_биография"')
+        else:
+            about = get_about(message.from_user.id)[0]
+            if about == None:
+                await message.answer(
+                    'Вы еще не заполнили свою биографию! Напишите "!биография заполнить ваша_биография"')
+            else:
+                await message.answer(f'Вот ваша биография:\n{about}')
+    except:
+        about = get_about(message.from_user.id)[0]
+        if about == None:
+            await message.answer('Вы еще не заполнили свою биографию! Напишите "!биография заполнить ваша_биография"')
+        else:
+            await message.answer(f'Вот ваша биография:\n{about}')
 
 
 '''
