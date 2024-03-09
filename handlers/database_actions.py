@@ -247,47 +247,53 @@ async def dick(message: types.Message):
     now = datetime.datetime.now()
     userid = message.from_user.id
     a = get_user_dick(userid)
+    is_sick = get_sick(userid)[0]
     if int(message.chat.id) - int(config.GROUP_ID) != 0:
         await message.reply('Вы не состоите в группе!')
-    try:
-        medication = message.text.split()[1]
-        if now - datetime.datetime.strptime(a[5], '%Y-%m-%d %H:%M:%S.%f') < datetime.timedelta(hours=24):
-            time_since_last_use = now - datetime.datetime.strptime(a[5], '%Y-%m-%d %H:%M:%S.%f')
-            time_since_last_use = time_since_last_use - datetime.timedelta(
-                microseconds=time_since_last_use.microseconds)
-            time_until_next_use = datetime.timedelta(hours=24) - time_since_last_use
-            await message.reply(
-                f'Вы уже пытались вырастить хуй сегодня, возвращайтесь через {time_until_next_use}! Сейчас ваш хуй равен {a[3]} см')
-        else:
-            if a is None:
-                add_dick(message.from_user.id, message.from_user.full_name)
-                await message.reply('Вы не можете увеличить хуй, не имея увеличителя!')
+        return
+    if is_sick == 1:
+        await message.reply('Вы болеете и не можете увеличивать хуй!')
+        return 
+    else:
+        try:
+            medication = message.text.split()[1]
+            if now - datetime.datetime.strptime(a[5], '%Y-%m-%d %H:%M:%S.%f') < datetime.timedelta(hours=24):
+                time_since_last_use = now - datetime.datetime.strptime(a[5], '%Y-%m-%d %H:%M:%S.%f')
+                time_since_last_use = time_since_last_use - datetime.timedelta(
+                    microseconds=time_since_last_use.microseconds)
+                time_until_next_use = datetime.timedelta(hours=24) - time_since_last_use
+                await message.reply(
+                    f'Вы уже пытались вырастить хуй сегодня, возвращайтесь через {time_until_next_use}! Сейчас ваш хуй равен {a[3]} см')
             else:
-                if medication.lower() == 'сода':
-                    if get_objects(userid)[0] == 1:
-                        size = randint(1, 10)
-                        update_dick1(a[3] + size, now, userid, get_objects(userid)[0] - 1)
-                        await message.reply(f'Ваш хуй увеличился на {size} см, теперь он равен {a[3] + size} см')
-                    else:
-                        await message.reply('У вас нет соды!')
-                elif medication.lower() == 'настойка':
-                    if get_objects(userid)[1] == 1:
-                        size = randint(5, 20)
-                        update_dick2(a[3] + size, now, userid, get_objects(userid)[1] - 1)
-                        await message.reply(f'Ваш хуй увеличился на {size} см, теперь он равен {a[3] + size} см')
-                    else:
-                        await message.reply('У вас нет настойки!')
-                elif medication.lower() == 'препарат':
-                    if get_objects(userid)[2] == 1:
-                        size = randint(10, 40)
-                        update_dick1(a[3] + size, now, userid, get_objects(userid)[2] - 1)
-                        await message.reply(f'Ваш хуй увеличился на {size} см, теперь он равен {a[3] + size} см')
-                    else:
-                        await message.reply('У вас нет европейского препарата!')
+                if a is None:
+                    add_dick(message.from_user.id, message.from_user.full_name)
+                    await message.reply('Вы не можете увеличить хуй, не имея увеличителя!')
                 else:
-                    await message.reply('Такого увеличителя нет!')
-    except:
-        await message.reply('Неверно введено! Введите "!хуй название_увеличителя"(без надписей в скобках)')
+                    if medication.lower() == 'сода':
+                        if get_objects(userid)[0] == 1:
+                            size = randint(1, 10)
+                            update_dick1(a[3] + size, now, userid, get_objects(userid)[0] - 1)
+                            await message.reply(f'Ваш хуй увеличился на {size} см, теперь он равен {a[3] + size} см')
+                        else:
+                            await message.reply('У вас нет соды!')
+                    elif medication.lower() == 'настойка':
+                        if get_objects(userid)[1] == 1:
+                            size = randint(5, 20)
+                            update_dick2(a[3] + size, now, userid, get_objects(userid)[1] - 1)
+                            await message.reply(f'Ваш хуй увеличился на {size} см, теперь он равен {a[3] + size} см')
+                        else:
+                            await message.reply('У вас нет настойки!')
+                    elif medication.lower() == 'препарат':
+                        if get_objects(userid)[2] == 1:
+                            size = randint(10, 40)
+                            update_dick1(a[3] + size, now, userid, get_objects(userid)[2] - 1)
+                            await message.reply(f'Ваш хуй увеличился на {size} см, теперь он равен {a[3] + size} см')
+                        else:
+                            await message.reply('У вас нет европейского препарата!')
+                    else:
+                        await message.reply('Такого увеличителя нет!')
+        except:
+            await message.reply('Неверно введено! Введите "!хуй название_увеличителя"(без надписей в скобках)')
 
 
 @router.message(Command('топ_хуев', 'тх', prefix='!'))
