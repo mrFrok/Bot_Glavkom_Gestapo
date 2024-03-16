@@ -15,7 +15,8 @@ from db import add_user, update_user, update_dick1, update_dick2, update_dick3, 
     update_reputation, get_last_use_reputation, update_last_use_reputation, get_work_level, get_work_use, \
     update_work_use, update_work_level, update_sick, heal_sick, get_objects, update_object1, update_object2, \
     update_object3, update_medicine, get_last_worked, update_money, update_last_worked, get_money, get_inventory, \
-    get_medicine, get_sick, decrease_dick, update_about, get_about
+    get_medicine, get_sick, decrease_dick, update_about, get_about, add_loan, get_loan, update_loan_balance, \
+    repay_the_loan
 import datetime
 from pyrogram_config import get_chat_members_id, get_chat_members_name, get_chat_members_username
 from filters import IsAdminFilter
@@ -102,7 +103,7 @@ async def work(message: types.Message):
                 update_money(message.from_user.id, money_old + money)
                 await message.reply(f'За ваше усердие на работе начальник выписал вам премию в {money} монет')
             randoms = random.random()
-            if randoms < 0.07:
+            if randoms < 0.05:
                 update_sick(message.from_user.id, 1)
                 await message.reply(
                     'Вы работали слишком усердно, и подхватили болезнь! Теперь ваш хуй будет уменьшаться каждый день на 2 см, и вы не сможете увеличивать хуй! Вылечитесь как можно быстрее!')
@@ -248,12 +249,15 @@ async def dick(message: types.Message):
     userid = message.from_user.id
     a = get_user_dick(userid)
     is_sick = get_sick(userid)[0]
+    if a is None:
+        await message.reply('Вы не можете увеличить хуй, не имея увеличителя!')
+        return
     if int(message.chat.id) - int(config.GROUP_ID) != 0:
         await message.reply('Вы не состоите в группе!')
         return
     if is_sick == 1:
         await message.reply('Вы болеете и не можете увеличивать хуй!')
-        return 
+        return
     else:
         try:
             medication = message.text.split()[1]
@@ -278,14 +282,14 @@ async def dick(message: types.Message):
                             await message.reply('У вас нет соды!')
                     elif medication.lower() == 'настойка':
                         if get_objects(userid)[1] == 1:
-                            size = randint(5, 20)
+                            size = randint(10, 20)
                             update_dick2(a[3] + size, now, userid, get_objects(userid)[1] - 1)
                             await message.reply(f'Ваш хуй увеличился на {size} см, теперь он равен {a[3] + size} см')
                         else:
                             await message.reply('У вас нет настойки!')
                     elif medication.lower() == 'препарат':
                         if get_objects(userid)[2] == 1:
-                            size = randint(10, 40)
+                            size = randint(20, 40)
                             update_dick1(a[3] + size, now, userid, get_objects(userid)[2] - 1)
                             await message.reply(f'Ваш хуй увеличился на {size} см, теперь он равен {a[3] + size} см')
                         else:
@@ -294,6 +298,114 @@ async def dick(message: types.Message):
                         await message.reply('Такого увеличителя нет!')
         except:
             await message.reply('Неверно введено! Введите "!хуй название_увеличителя"(без надписей в скобках)')
+
+
+@router.message(Command('взять_кредит', 'Взять_кредит', prefix='!'))
+async def take_loan(message: types.Message):
+    userid = message.from_user.id
+    is_loan = get_loan(userid)[0]
+    if is_loan == 1:
+        await message.reply(
+            f'Вы уже брали кредит! Ваш долг составляет 250 монет! У вас осталось {datetime.datetime.now() - datetime.datetime.strptime(get_loan(userid)[2], '%Y-%m-%d %H:%M:%S.%f')} дней')
+    else:
+        update_money(userid, get_money(userid)[0] + 200)
+        add_loan(userid, 1, 250, datetime.datetime.now())
+        await message.reply(
+            'Вы взяли кредит на 200 монет! Вы должны будете вернуть 250 монет через 14 дней! Если вы не вернете 250 монет в течение 7 дней, ваш долг будет увеличиваться на 10 монет ежедневно!')
+
+
+@router.message(Command('кредит', 'Кредит', prefix='!'))
+async def credit(message: types.Message):
+    userid = message.from_user.id
+    is_loan = get_loan(userid)[0]
+    if is_loan == 1:
+        date_loan = get_loan(userid)[2]
+        last_date_loan = get_loan(userid)[3]
+        days = datetime.datetime.now() - datetime.datetime.strptime(date_loan, '%Y-%m-%d %H:%M:%S.%f')
+        days = (datetime.timedelta(days=14) - days).days
+        if datetime.datetime.now() - datetime.datetime.strptime(date_loan, '%Y-%m-%d %H:%M:%S.%f') > datetime.timedelta(
+                days=14):
+            if last_date_loan is None or datetime.datetime.now() - datetime.datetime.strptime(last_date_loan,
+                                                                                              '%Y-%m-%d %H:%M:%S.%f') > datetime.timedelta(
+                    hours=24):
+                try:
+                    loan = 10 * (datetime.datetime.now() - datetime.datetime.strptime(get_loan(userid)[4], '%Y-%m-%d %H:%M:%S.%f')).days
+                    update_loan_balance(userid, get_loan(userid)[1] + loan, datetime.datetime.now(), datetime.datetime.now())
+                    await message.reply(f'Ваш долг увеличился на {loan} монет из-за просрочки на {days} дней!')
+                    await message.reply(
+                        f'Ваш долг составляет {get_loan(userid)[1]} монет! У вас осталось {days} дней')
+                    return
+                except:
+                    loan = 10 * -1 * days
+                    update_loan_balance(userid, get_loan(userid)[1] + loan, datetime.datetime.now(),
+                                        datetime.datetime.now())
+                    await message.reply(f'Ваш долг увеличился на {loan} монет из-за просрочки на {days} дней!')
+                    await message.reply(
+                        f'Ваш долг составляет {get_loan(userid)[1]} монет! У вас осталось {days} дней')
+                    return
+            else:
+                await message.reply(
+                    f'Ваш долг составляет {get_loan(userid)[1]} монет! У вас осталось {days} дней')
+                return
+        await message.reply(
+            f'Ваш долг составляет {get_loan(userid)[1]} монет! У вас осталось {days} дней')
+    else:
+        await message.reply('У вас нет кредита!')
+
+
+@router.message(Command('выплатить_кредит', 'Выплатить_кредит', 'погасить_кредит', 'Погасить_кредит', prefix='!'))
+async def repay_loan(message: types.Message):
+    userid = message.from_user.id
+    is_loan = get_loan(userid)[0]
+    date_loan = get_loan(userid)[2]
+    days = datetime.datetime.now() - datetime.datetime.strptime(date_loan, '%Y-%m-%d %H:%M:%S.%f')
+    days = datetime.timedelta(days=14) - days
+    last_date_loan = get_loan(userid)[3]
+    if is_loan == 1:
+        if datetime.datetime.now() - datetime.datetime.strptime(date_loan, '%Y-%m-%d %H:%M:%S.%f') > datetime.timedelta(
+                days=14):
+            if last_date_loan is None or datetime.datetime.now() - datetime.datetime.strptime(last_date_loan,
+                                                                                              '%Y-%m-%d %H:%M:%S.%f') > datetime.timedelta(
+                    hours=24):
+                try:
+                    loan = 10 * (datetime.datetime.now() - datetime.datetime.strptime(get_loan(userid)[4], '%Y-%m-%d %H:%M:%S.%f')).days
+                    update_loan_balance(userid, get_loan(userid)[1] + loan, datetime.datetime.now(), datetime.datetime.now())
+                    if get_money(userid)[0] >= get_loan(userid)[1]:
+                        update_money(userid, get_money(userid)[0] - get_loan(userid)[1])
+
+                        repay_the_loan(userid, 0)
+                        await message.reply('Вы выплатили кредит!')
+                        return
+                    else:
+                        await message.reply(
+                            f'У вас недостаточно монет! Вам нужно ещё {get_loan(userid)[1] - get_money(userid)[0]} монет')
+                        return
+                except:
+                    loan = 10 * -1 * days
+                    update_loan_balance(userid, get_loan(userid)[1] + loan, datetime.datetime.now(),
+                                        datetime.datetime.now())
+                    if get_money(userid)[0] >= get_loan(userid)[1]:
+                        update_money(userid, get_money(userid)[0] - get_loan(userid)[1])
+
+                        repay_the_loan(userid, 0)
+                        await message.reply('Вы выплатили кредит!')
+                        return
+                    else:
+                        await message.reply(
+                            f'У вас недостаточно монет! Вам нужно ещё {get_loan(userid)[1] - get_money(userid)[0]} монет')
+                        return
+        if get_money(userid)[0] >= get_loan(userid)[1]:
+            update_money(userid, get_money(userid)[0] - get_loan(userid)[1])
+            repay_the_loan(userid, 0)
+            await message.reply('Вы выплатили кредит!')
+            return
+        else:
+            await message.reply(
+                f'У вас недостаточно монет! Вам нужно ещё {get_loan(userid)[1] - get_money(userid)[0]} монет')
+            return
+    else:
+        await message.reply('У вас нет кредита!')
+        return
 
 
 @router.message(Command('топ_хуев', 'тх', prefix='!'))
@@ -396,9 +508,8 @@ async def case(message: types.Message):
             personal = get_user_from_username(mention)[0]
             personally_case = get_user_restricts_for_two_weeks(personal)
             response = 'Все нарушения пользователя за 2 недели: \n'
-            for z in personally_case:
-                for i, (x, y, m) in enumerate([z], start=1):
-                    response += f'{i}. Тип наказания: {x}, Причина наказания: {y}, Дата наказания: {m}\n'
+            for i, (x, y, m) in enumerate(personally_case, start=1):
+                response += f'{i}. Тип наказания: {x}, Причина наказания: {y}, Дата наказания: {m}\n'
             await message.reply(response)
         except:
             await message.reply('Пользователь чист')
@@ -426,7 +537,7 @@ async def rep(message: types.Message):
             time_since_last_use = time_since_last_use - datetime.timedelta(
                 microseconds=time_since_last_use.microseconds)
             time_until_next_use = datetime.timedelta(hours=3) - time_since_last_use
-            await message.answer(f'Вы уже оказывали уважение! Возвращайстесь через {time_until_next_use}')
+            await message.answer(f'Вы уже оказывали уважение\неуважение! Возвращайстесь через {time_until_next_use}')
     else:
         await message.answer('Нельзя оказывать уважение самому себе')
 
@@ -446,14 +557,14 @@ async def rep_min(message: types.Message):
             update_reputation(message.reply_to_message.from_user.id, rep)
             update_last_use_reputation(message.from_user.id, datetime.datetime.now())
             await message.answer(
-                f'{message.from_user.mention_html()} оказывает уважение <a href="tg://user?id={message.reply_to_message.from_user.id}">{message.reply_to_message.from_user.full_name}</a> (-1)')
+                f'{message.from_user.mention_html()} неуважает <a href="tg://user?id={message.reply_to_message.from_user.id}">{message.reply_to_message.from_user.full_name}</a> (-1)')
         else:
             time_since_last_use = datetime.datetime.now() - datetime.datetime.strptime(last_used,
                                                                                        '%Y-%m-%d %H:%M:%S.%f')
             time_since_last_use = time_since_last_use - datetime.timedelta(
                 microseconds=time_since_last_use.microseconds)
             time_until_next_use = datetime.timedelta(hours=3) - time_since_last_use
-            await message.answer(f'Вы уже оказывали уважение! Возвращайстесь через {time_until_next_use}')
+            await message.answer(f'Вы уже оказывали уважение\неуважение! Возвращайстесь через {time_until_next_use}')
     else:
         await message.answer('Нельзя оказывать уважение самому себе')
 
@@ -462,9 +573,8 @@ async def rep_min(message: types.Message):
 async def top_rep(message: types.Message):
     top_rep = get_top_reputation()
     response = 'Топ-10 репутации:\n'
-    for x in top_rep:
-        for i, (userid, name, reputation) in enumerate([x], start=1):
-            response += f'{i}. <a href="tg://user?id={userid}">{name}</a> ({reputation})\n'
+    for i, (userid, name, reputation) in enumerate(top_rep, start=1):
+        response += f'{i}. <a href="tg://user?id={userid}">{name}</a> ({reputation})\n'
     await message.answer(response)
 
 

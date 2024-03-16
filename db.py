@@ -304,6 +304,42 @@ def decrease_dick(userid, size):
     conn.close()
 
 
+def add_loan(userid, is_loan, loan_balance, date_loan):
+    conn = sqlite3.connect('database.db')
+    c = conn.cursor()
+    c.execute('UPDATE dicks SET is_loan =?, loan_balance =?, date_loan = ? WHERE userid =?',
+              (is_loan, loan_balance, date_loan, userid))
+    conn.commit()
+    conn.close()
+
+
+def get_loan(userid):
+    conn = sqlite3.connect('database.db')
+    c = conn.cursor()
+    c.execute('SELECT is_loan, loan_balance, date_loan, last_check_loan, last_update_loan FROM dicks WHERE userid = ?', (userid,))
+    loan = c.fetchone()
+    conn.close()
+    return loan
+
+
+def update_loan_balance(userid, loan_balance, last_check_loan, last_update_loan):
+    conn = sqlite3.connect('database.db')
+    c = conn.cursor()
+    c.execute('UPDATE dicks SET loan_balance = ?, last_check_loan = ?, last_update_loan = ? WHERE userid = ?',
+              (loan_balance, last_check_loan, last_update_loan, userid))
+    conn.commit()
+    conn.close()
+
+
+def repay_the_loan(userid, is_loan):
+    conn = sqlite3.connect('database.db')
+    c = conn.cursor()
+    c.execute('UPDATE dicks SET loan_balance = 0, is_loan = ?, date_loan = NULL, last_check_loan = NULL, last_update_loan = NULL WHERE userid =?',
+              (is_loan, userid))
+    conn.commit()
+    conn.close()
+
+
 def full_update(userid, username, name):
     conn = sqlite3.connect('database.db')
     c = conn.cursor()
