@@ -169,11 +169,11 @@ async def upgrade(message: types.Message):
 
 @router.message(Command('лечиться', 'Лечиться', prefix='!'))
 async def heal(message: types.Message):
-    medecine = get_medicine(message.from_user.id)[0]
+    medicine = get_medicine(message.from_user.id)[0]
     is_sick = get_sick(message.from_user.id)[0]
     if is_sick == 1:
-        if medecine > 0:
-            update_sick(message.from_user.id, medecine - 1)
+        if medicine > 0:
+            update_sick(message.from_user.id, 0, medicine - 1)
             await message.reply('Вы вылечились!')
         else:
             await message.reply('У вас нет лекарств!')
@@ -290,7 +290,7 @@ async def dick(message: types.Message):
                     elif medication.lower() == 'препарат':
                         if get_objects(userid)[2] == 1:
                             size = randint(20, 40)
-                            update_dick1(a[3] + size, now, userid, get_objects(userid)[2] - 1)
+                            update_dick3(a[3] + size, now, userid, get_objects(userid)[2] - 1)
                             await message.reply(f'Ваш хуй увеличился на {size} см, теперь он равен {a[3] + size} см')
                         else:
                             await message.reply('У вас нет европейского препарата!')
