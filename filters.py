@@ -11,5 +11,3 @@ class IsAdminFilter(BaseFilter):
     async def __call__(self, message: types.Message):
         member = await message.bot.get_chat_member(message.chat.id, message.from_user.id)
         return IS_ADMIN.check(member=member)
-
-
