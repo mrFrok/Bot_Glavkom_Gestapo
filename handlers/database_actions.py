@@ -1,9 +1,10 @@
+import asyncio
 import random
 from aiogram import types, Router, F
 from aiogram.filters import Command
-from bot import dp, bot
 from aiogram.types import Message
 from random import randint, choice
+from bot import bot, dp
 import config
 from db import add_user, update_user, update_dick1, update_dick2, update_dick3, get_user, get_top_dicks, get_users, \
     delete_user, \
@@ -21,6 +22,11 @@ import datetime
 from pyrogram_config import get_chat_members_id, get_chat_members_name, get_chat_members_username
 from filters import IsAdminFilter
 import re
+from aiogram.fsm.state import StatesGroup, State
+from aiogram.filters import Command, StateFilter
+from aiogram.fsm.context import FSMContext
+from aiogram.utils.keyboard import InlineKeyboardBuilder
+
 
 router = Router()
 
@@ -44,8 +50,12 @@ async def start(message: types.Message):
         await message.reply('Вы уже есть в базе данных!')
 
 
-@router.message(Command('работать', 'Работать', prefix='!'))
-async def work(message: types.Message):
+class Remind(StatesGroup):
+    YesOrNo = State()
+
+
+@router.message(Command('работать', 'Работать', prefix='!'), StateFilter(None))
+async def work(message: types.Message, state: FSMContext):
     add_dick(message.from_user.id, message.from_user.full_name)
     date_worked = get_last_worked(message.from_user.id)[0]
     if datetime.datetime.now() - datetime.datetime.strptime(date_worked, '%Y-%m-%d %H:%M:%S.%f') > datetime.timedelta(
@@ -75,24 +85,72 @@ async def work(message: types.Message):
                 update_work_use(message.from_user.id, get_work_use(message.from_user.id)[0] + 1)
                 update_last_worked(message.from_user.id, datetime.datetime.now())
                 update_money(message.from_user.id, money_old + money)
+                try:
+                    update_reminder(message.from_user.id, datetime.datetime.now().strftime('%Y-%m-%d %H:%M'))
+                except:
+                    pass
                 await message.reply(
                     f'Вы заработали {money} монет. Сейчас вы отработали {get_work_use(message.from_user.id)[0]} раз')
+                if check_reminder(message.from_user.id) is None:
+                    builder = InlineKeyboardBuilder()
+                    builder.add(types.InlineKeyboardButton(
+                        text="Да",
+                        callback_data="да")
+                    )
+                    builder.add(types.InlineKeyboardButton(
+                        text="Нет",
+                        callback_data="нет")
+                    )
+                    await message.reply('Хотите ли вы подписаться на рассылку?', reply_markup=builder.as_markup())
+                    await state.set_state(Remind.YesOrNo)
             elif level == 2:
                 money_old = get_money(message.from_user.id)[0]
                 money = randint(20, 40)
                 update_work_use(message.from_user.id, get_work_use(message.from_user.id)[0] + 1)
                 update_last_worked(message.from_user.id, datetime.datetime.now())
                 update_money(message.from_user.id, money_old + money)
+                try:
+                    update_reminder(message.from_user.id, datetime.datetime.now().strftime('%Y-%m-%d %H:%M'))
+                except:
+                    pass
                 await message.reply(
                     f'Вы заработали {money} монет. Сейчас вы отработали {get_work_use(message.from_user.id)[0]} раз')
+                if check_reminder(message.from_user.id) is None:
+                    builder = InlineKeyboardBuilder()
+                    builder.add(types.InlineKeyboardButton(
+                        text="Да",
+                        callback_data="да")
+                    )
+                    builder.add(types.InlineKeyboardButton(
+                        text="Нет",
+                        callback_data="нет")
+                    )
+                    await message.reply('Хотите ли вы подписаться на рассылку?', reply_markup=builder.as_markup())
+                    await state.set_state(Remind.YesOrNo)
             elif level == 3:
                 money_old = get_money(message.from_user.id)[0]
                 money = randint(40, 80)
                 update_work_use(message.from_user.id, get_work_use(message.from_user.id)[0] + 1)
                 update_last_worked(message.from_user.id, datetime.datetime.now())
                 update_money(message.from_user.id, money_old + money)
+                try:
+                    update_reminder(message.from_user.id, datetime.datetime.now().strftime('%Y-%m-%d %H:%M'))
+                except:
+                    pass
                 await message.reply(
                     f'Вы заработали {money} монет. Сейчас вы отработали {get_work_use(message.from_user.id)[0]} раз')
+                if check_reminder(message.from_user.id) is None:
+                    builder = InlineKeyboardBuilder()
+                    builder.add(types.InlineKeyboardButton(
+                        text="Да",
+                        callback_data="да")
+                    )
+                    builder.add(types.InlineKeyboardButton(
+                        text="Нет",
+                        callback_data="нет")
+                    )
+                    await message.reply('Хотите ли вы подписаться на рассылку?', reply_markup=builder.as_markup())
+                    await state.set_state(Remind.YesOrNo)
             else:
                 await message.reply('Ошибка какая то :)')
         else:
@@ -114,24 +172,72 @@ async def work(message: types.Message):
                 update_work_use(message.from_user.id, get_work_use(message.from_user.id)[0] + 1)
                 update_last_worked(message.from_user.id, datetime.datetime.now())
                 update_money(message.from_user.id, money_old + money)
+                try:
+                    update_reminder(message.from_user.id, datetime.datetime.now().strftime('%Y-%m-%d %H:%M'))
+                except:
+                    pass
                 await message.reply(
                     f'Вы заработали {money} монет. Сейчас вы отработали {get_work_use(message.from_user.id)[0]} раз')
+                if check_reminder(message.from_user.id) is None:
+                    builder = InlineKeyboardBuilder()
+                    builder.add(types.InlineKeyboardButton(
+                        text="Да",
+                        callback_data="да")
+                    )
+                    builder.add(types.InlineKeyboardButton(
+                        text="Нет",
+                        callback_data="нет")
+                    )
+                    await message.reply('Хотите ли вы подписаться на рассылку?', reply_markup=builder.as_markup())
+                    await state.set_state(Remind.YesOrNo)
             elif level == 2:
                 money_old = get_money(message.from_user.id)[0]
                 money = randint(20, 40)
                 update_work_use(message.from_user.id, get_work_use(message.from_user.id)[0] + 1)
                 update_last_worked(message.from_user.id, datetime.datetime.now())
                 update_money(message.from_user.id, money_old + money)
+                try:
+                    update_reminder(message.from_user.id, datetime.datetime.now().strftime('%Y-%m-%d %H:%M'))
+                except:
+                    pass
                 await message.reply(
                     f'Вы заработали {money} монет. Сейчас вы отработали {get_work_use(message.from_user.id)[0]} раз')
+                if check_reminder(message.from_user.id) is None:
+                    builder = InlineKeyboardBuilder()
+                    builder.add(types.InlineKeyboardButton(
+                        text="Да",
+                        callback_data="да")
+                    )
+                    builder.add(types.InlineKeyboardButton(
+                        text="Нет",
+                        callback_data="нет")
+                    )
+                    await message.reply('Хотите ли вы подписаться на рассылку?', reply_markup=builder.as_markup())
+                    await state.set_state(Remind.YesOrNo)
             elif level == 3:
                 money_old = get_money(message.from_user.id)[0]
                 money = randint(40, 80)
                 update_work_use(message.from_user.id, get_work_use(message.from_user.id)[0] + 1)
                 update_last_worked(message.from_user.id, datetime.datetime.now())
                 update_money(message.from_user.id, money_old + money)
+                try:
+                    update_reminder(message.from_user.id, datetime.datetime.now().strftime('%Y-%m-%d %H:%M'))
+                except:
+                    pass
                 await message.reply(
                     f'Вы заработали {money} монет. Сейчас вы отработали {get_work_use(message.from_user.id)[0]} раз')
+                if check_reminder(message.from_user.id) is None:
+                    builder = InlineKeyboardBuilder()
+                    builder.add(types.InlineKeyboardButton(
+                        text="Да",
+                        callback_data="да")
+                    )
+                    builder.add(types.InlineKeyboardButton(
+                        text="Нет",
+                        callback_data="нет")
+                    )
+                    await message.reply('Хотите ли вы подписаться на рассылку?', reply_markup=builder.as_markup())
+                    await state.set_state(Remind.YesOrNo)
             else:
                 await message.reply('Ошибка какая то :)')
     else:
@@ -142,6 +248,35 @@ async def work(message: types.Message):
         await message.reply(
             f'Вы уже работали сегодня, возвращайтесь через {time_until_next_use}!')
 
+
+@router.callback_query(F.data == 'да', Remind.YesOrNo)
+async def yes(callback: types.CallbackQuery, state: FSMContext):
+    now = datetime.datetime.now().strftime('%Y-%m-%d %H:%M')
+    new_reminder(callback.from_user.id, callback.from_user.full_name, now)
+    await callback.message.answer('Вы подписались на рассылку! Не забудьте начать диалог с ботом, если вы его ещё не начали')
+    await bot.send_message(callback.from_user.id, 'Проверка. Вы подписались на напоминание')
+    await state.clear()
+
+@router.callback_query(F.data == 'нет', Remind.YesOrNo)
+async def no(callback: types.CallbackQuery, state: FSMContext):
+    await callback.message.answer('Как хотите!')
+    await state.clear()
+
+@router.message(Remind.YesOrNo)
+async def yes_or_no(message: types.Message, state: FSMContext):
+    if message.text == 'да':
+        now = datetime.datetime.now().strftime('%Y-%m-%d %H:%M')
+        new_reminder(message.from_user.id, message.from_user.full_name, now)
+        await bot.send_message(message.from_user.id, 'Проверка. Вы подписались на напоминание')
+        await message.reply('Вы подписались на рассылку! Не забудьте начать диалог с ботом, если вы его ещё не начали')
+    else:
+        await message.reply('Как хотите!')
+    await state.clear()
+
+@router.message(Command('Отписаться', 'отписаться', prefix='!'))
+async def unsubscribe(message: types.Message):
+    delete_reminder(message.from_user.id)
+    await message.reply('Вы отписались от рассылки!')
 
 @router.message(Command('повышение', 'Повышение', prefix='!'))
 async def upgrade(message: types.Message):
@@ -173,7 +308,7 @@ async def heal(message: types.Message):
     is_sick = get_sick(message.from_user.id)[0]
     if is_sick == 1:
         if medicine > 0:
-            update_sick(message.from_user.id, 0, medicine - 1)
+            heal_sick(message.from_user.id, 0, medicine - 1)
             await message.reply('Вы вылечились!')
         else:
             await message.reply('У вас нет лекарств!')

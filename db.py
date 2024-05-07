@@ -267,12 +267,11 @@ def get_sick(userid):
     return sick
 
 
-def update_sick(userid, sick, medicine):
+def update_sick(userid, sick):
     conn = sqlite3.connect('database.db')
     c = conn.cursor()
     c.execute('UPDATE dicks SET is_sick =? WHERE userid =?',
               (sick, userid))
-    c.execute('UPDATE dicks_inventory SET medicine =? WHERE userid =?', (medicine, userid))
     conn.commit()
     conn.close()
 
@@ -282,7 +281,7 @@ def heal_sick(userid, sick, medicine):
     c = conn.cursor()
     c.execute('UPDATE dicks SET is_sick =? WHERE userid =?',
               (sick, userid))
-    c.execute('UPDATE dicks_inventory SET medicine =? WHERE userid =?', )
+    c.execute('UPDATE dicks_inventory SET medicine =? WHERE userid =?', (medicine, userid))
     conn.commit()
     conn.close()
 
@@ -317,7 +316,8 @@ def add_loan(userid, is_loan, loan_balance, date_loan):
 def get_loan(userid):
     conn = sqlite3.connect('database.db')
     c = conn.cursor()
-    c.execute('SELECT is_loan, loan_balance, date_loan, last_check_loan, last_update_loan FROM dicks WHERE userid = ?', (userid,))
+    c.execute('SELECT is_loan, loan_balance, date_loan, last_check_loan, last_update_loan FROM dicks WHERE userid = ?',
+              (userid,))
     loan = c.fetchone()
     conn.close()
     return loan
@@ -335,8 +335,9 @@ def update_loan_balance(userid, loan_balance, last_check_loan, last_update_loan)
 def repay_the_loan(userid, is_loan):
     conn = sqlite3.connect('database.db')
     c = conn.cursor()
-    c.execute('UPDATE dicks SET loan_balance = 0, is_loan = ?, date_loan = NULL, last_check_loan = NULL, last_update_loan = NULL WHERE userid =?',
-              (is_loan, userid))
+    c.execute(
+        'UPDATE dicks SET loan_balance = 0, is_loan = ?, date_loan = NULL, last_check_loan = NULL, last_update_loan = NULL WHERE userid =?',
+        (is_loan, userid))
     conn.commit()
     conn.close()
 
@@ -449,10 +450,10 @@ def get_user_nedr(userid):
     return user
 
 
-def new_reminder(userid, name):
+def new_reminder(userid, name, time):
     conn = sqlite3.connect('database.db')
     c = conn.cursor()
-    c.execute('INSERT INTO reminder (userid, name, active) VALUES (?, ?, 1)', (userid, name))
+    c.execute('INSERT INTO reminder (userid, name, is_send, time) VALUES (?, ?, 0, ?)', (userid, name, time))
     conn.commit()
     conn.close()
 
@@ -460,7 +461,8 @@ def new_reminder(userid, name):
 def check_reminder(userid):
     conn = sqlite3.connect('database.db')
     c = conn.cursor()
-    c.execute('SELECT active FROM reminder WHERE userid=?', (userid,))
+    c.execute('SELECT name FROM reminder WHERE userid=?',
+              (userid,))  # Небольшой костыль, мне просто нужно знать, есть ли пользователь в бд :)
     user = c.fetchone()
     return user
 
@@ -475,14 +477,21 @@ def delete_reminder(userid):
 def update_reminder(userid, time):
     conn = sqlite3.connect('database.db')
     c = conn.cursor()
-    c.execute('UPDATE reminder SET time = ? WHERE userid =?', (time, userid))
+    c.execute('UPDATE reminder SET time = ?, is_send = 0 WHERE userid =?', (time, userid))
+    conn.commit()
+
+
+def update_send_remind(userid):
+    conn = sqlite3.connect('database.db')
+    c = conn.cursor()
+    c.execute('UPDATE reminder SET is_send = 1 WHERE userid =?', (userid,))
     conn.commit()
 
 
 def get_reminders():
     conn = sqlite3.connect('database.db')
     c = conn.cursor()
-    c.execute('SELECT userid FROM reminder')
+    c.execute('SELECT userid, time, is_send FROM reminder')
     users = c.fetchall()
     return users
 
@@ -590,6 +599,7 @@ def update_about(userid, about):
     c.execute('UPDATE users SET about = ? WHERE userid =?', (about, userid))
     conn.commit()
     conn.close()
+
 
 def get_about(userid):
     conn = sqlite3.connect('database.db')
