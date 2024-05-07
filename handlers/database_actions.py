@@ -25,6 +25,8 @@ import re
 from aiogram.fsm.state import StatesGroup, State
 from aiogram.filters import Command, StateFilter
 from aiogram.fsm.context import FSMContext
+from aiogram.utils.keyboard import InlineKeyboardBuilder
+
 
 router = Router()
 
@@ -90,7 +92,16 @@ async def work(message: types.Message, state: FSMContext):
                 await message.reply(
                     f'Вы заработали {money} монет. Сейчас вы отработали {get_work_use(message.from_user.id)[0]} раз')
                 if check_reminder(message.from_user.id) is None:
-                    await message.reply('Хотите ли вы подписаться на рассылку? Да/Нет')
+                    builder = InlineKeyboardBuilder()
+                    builder.add(types.InlineKeyboardButton(
+                        text="Да",
+                        callback_data="да")
+                    )
+                    builder.add(types.InlineKeyboardButton(
+                        text="Нет",
+                        callback_data="нет")
+                    )
+                    await message.reply('Хотите ли вы подписаться на рассылку?', reply_markup=builder.as_markup())
                     await state.set_state(Remind.YesOrNo)
             elif level == 2:
                 money_old = get_money(message.from_user.id)[0]
@@ -105,7 +116,16 @@ async def work(message: types.Message, state: FSMContext):
                 await message.reply(
                     f'Вы заработали {money} монет. Сейчас вы отработали {get_work_use(message.from_user.id)[0]} раз')
                 if check_reminder(message.from_user.id) is None:
-                    await message.reply('Хотите ли вы подписаться на рассылку? Да/Нет')
+                    builder = InlineKeyboardBuilder()
+                    builder.add(types.InlineKeyboardButton(
+                        text="Да",
+                        callback_data="да")
+                    )
+                    builder.add(types.InlineKeyboardButton(
+                        text="Нет",
+                        callback_data="нет")
+                    )
+                    await message.reply('Хотите ли вы подписаться на рассылку?', reply_markup=builder.as_markup())
                     await state.set_state(Remind.YesOrNo)
             elif level == 3:
                 money_old = get_money(message.from_user.id)[0]
@@ -120,7 +140,16 @@ async def work(message: types.Message, state: FSMContext):
                 await message.reply(
                     f'Вы заработали {money} монет. Сейчас вы отработали {get_work_use(message.from_user.id)[0]} раз')
                 if check_reminder(message.from_user.id) is None:
-                    await message.reply('Хотите ли вы подписаться на рассылку? Да/Нет')
+                    builder = InlineKeyboardBuilder()
+                    builder.add(types.InlineKeyboardButton(
+                        text="Да",
+                        callback_data="да")
+                    )
+                    builder.add(types.InlineKeyboardButton(
+                        text="Нет",
+                        callback_data="нет")
+                    )
+                    await message.reply('Хотите ли вы подписаться на рассылку?', reply_markup=builder.as_markup())
                     await state.set_state(Remind.YesOrNo)
             else:
                 await message.reply('Ошибка какая то :)')
@@ -150,7 +179,16 @@ async def work(message: types.Message, state: FSMContext):
                 await message.reply(
                     f'Вы заработали {money} монет. Сейчас вы отработали {get_work_use(message.from_user.id)[0]} раз')
                 if check_reminder(message.from_user.id) is None:
-                    await message.reply('Хотите ли вы подписаться на рассылку? Да/Нет')
+                    builder = InlineKeyboardBuilder()
+                    builder.add(types.InlineKeyboardButton(
+                        text="Да",
+                        callback_data="да")
+                    )
+                    builder.add(types.InlineKeyboardButton(
+                        text="Нет",
+                        callback_data="нет")
+                    )
+                    await message.reply('Хотите ли вы подписаться на рассылку?', reply_markup=builder.as_markup())
                     await state.set_state(Remind.YesOrNo)
             elif level == 2:
                 money_old = get_money(message.from_user.id)[0]
@@ -165,7 +203,16 @@ async def work(message: types.Message, state: FSMContext):
                 await message.reply(
                     f'Вы заработали {money} монет. Сейчас вы отработали {get_work_use(message.from_user.id)[0]} раз')
                 if check_reminder(message.from_user.id) is None:
-                    await message.reply('Хотите ли вы подписаться на рассылку? Да/Нет')
+                    builder = InlineKeyboardBuilder()
+                    builder.add(types.InlineKeyboardButton(
+                        text="Да",
+                        callback_data="да")
+                    )
+                    builder.add(types.InlineKeyboardButton(
+                        text="Нет",
+                        callback_data="нет")
+                    )
+                    await message.reply('Хотите ли вы подписаться на рассылку?', reply_markup=builder.as_markup())
                     await state.set_state(Remind.YesOrNo)
             elif level == 3:
                 money_old = get_money(message.from_user.id)[0]
@@ -180,7 +227,16 @@ async def work(message: types.Message, state: FSMContext):
                 await message.reply(
                     f'Вы заработали {money} монет. Сейчас вы отработали {get_work_use(message.from_user.id)[0]} раз')
                 if check_reminder(message.from_user.id) is None:
-                    await message.reply('Хотите ли вы подписаться на рассылку? Да/Нет')
+                    builder = InlineKeyboardBuilder()
+                    builder.add(types.InlineKeyboardButton(
+                        text="Да",
+                        callback_data="да")
+                    )
+                    builder.add(types.InlineKeyboardButton(
+                        text="Нет",
+                        callback_data="нет")
+                    )
+                    await message.reply('Хотите ли вы подписаться на рассылку?', reply_markup=builder.as_markup())
                     await state.set_state(Remind.YesOrNo)
             else:
                 await message.reply('Ошибка какая то :)')
@@ -193,9 +249,22 @@ async def work(message: types.Message, state: FSMContext):
             f'Вы уже работали сегодня, возвращайтесь через {time_until_next_use}!')
 
 
+@router.callback_query(F.data == 'да', Remind.YesOrNo)
+async def yes(callback: types.CallbackQuery, state: FSMContext):
+    now = datetime.datetime.now().strftime('%Y-%m-%d %H:%M')
+    new_reminder(callback.from_user.id, callback.from_user.full_name, now)
+    await callback.message.answer('Вы подписались на рассылку! Не забудьте начать диалог с ботом, если вы его ещё не начали')
+    await bot.send_message(callback.from_user.id, 'Проверка. Вы подписались на напоминание')
+    await state.clear()
+
+@router.callback_query(F.data == 'нет', Remind.YesOrNo)
+async def no(callback: types.CallbackQuery, state: FSMContext):
+    await callback.message.answer('Как хотите!')
+    await state.clear()
+
 @router.message(Remind.YesOrNo)
 async def yes_or_no(message: types.Message, state: FSMContext):
-    if message.text.lower() == 'да':
+    if message.text == 'да':
         now = datetime.datetime.now().strftime('%Y-%m-%d %H:%M')
         new_reminder(message.from_user.id, message.from_user.full_name, now)
         await bot.send_message(message.from_user.id, 'Проверка. Вы подписались на напоминание')
@@ -239,7 +308,7 @@ async def heal(message: types.Message):
     is_sick = get_sick(message.from_user.id)[0]
     if is_sick == 1:
         if medicine > 0:
-            update_sick(message.from_user.id, 0, medicine - 1)
+            heal_sick(message.from_user.id, 0, medicine - 1)
             await message.reply('Вы вылечились!')
         else:
             await message.reply('У вас нет лекарств!')

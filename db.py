@@ -267,12 +267,11 @@ def get_sick(userid):
     return sick
 
 
-def update_sick(userid, sick, medicine):
+def update_sick(userid, sick):
     conn = sqlite3.connect('database.db')
     c = conn.cursor()
     c.execute('UPDATE dicks SET is_sick =? WHERE userid =?',
               (sick, userid))
-    c.execute('UPDATE dicks_inventory SET medicine =? WHERE userid =?', (medicine, userid))
     conn.commit()
     conn.close()
 
@@ -282,7 +281,7 @@ def heal_sick(userid, sick, medicine):
     c = conn.cursor()
     c.execute('UPDATE dicks SET is_sick =? WHERE userid =?',
               (sick, userid))
-    c.execute('UPDATE dicks_inventory SET medicine =? WHERE userid =?', )
+    c.execute('UPDATE dicks_inventory SET medicine =? WHERE userid =?', (medicine, userid))
     conn.commit()
     conn.close()
 
