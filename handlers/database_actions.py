@@ -409,21 +409,21 @@ async def dick(message: types.Message):
                     await message.reply('Вы не можете увеличить хуй, не имея увеличителя!')
                 else:
                     if medication.lower() == 'сода':
-                        if get_objects(userid)[0] == 1:
+                        if get_objects(userid)[0] >= 1:
                             size = randint(1, 10)
                             update_dick1(a[3] + size, now, userid, get_objects(userid)[0] - 1)
                             await message.reply(f'Ваш хуй увеличился на {size} см, теперь он равен {a[3] + size} см')
                         else:
                             await message.reply('У вас нет соды!')
                     elif medication.lower() == 'настойка':
-                        if get_objects(userid)[1] == 1:
+                        if get_objects(userid)[1] >= 1:
                             size = randint(10, 20)
                             update_dick2(a[3] + size, now, userid, get_objects(userid)[1] - 1)
                             await message.reply(f'Ваш хуй увеличился на {size} см, теперь он равен {a[3] + size} см')
                         else:
                             await message.reply('У вас нет настойки!')
                     elif medication.lower() == 'препарат':
-                        if get_objects(userid)[2] == 1:
+                        if get_objects(userid)[2] >= 1:
                             size = randint(20, 40)
                             update_dick3(a[3] + size, now, userid, get_objects(userid)[2] - 1)
                             await message.reply(f'Ваш хуй увеличился на {size} см, теперь он равен {a[3] + size} см')
