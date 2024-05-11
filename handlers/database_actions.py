@@ -27,7 +27,6 @@ from aiogram.filters import Command, StateFilter
 from aiogram.fsm.context import FSMContext
 from aiogram.utils.keyboard import InlineKeyboardBuilder
 
-
 router = Router()
 
 
@@ -89,8 +88,14 @@ async def work(message: types.Message, state: FSMContext):
                     update_reminder(message.from_user.id, datetime.datetime.now().strftime('%Y-%m-%d %H:%M'))
                 except:
                     pass
+                builder = InlineKeyboardBuilder()
+                builder.add(types.InlineKeyboardButton(
+                    text="В магазин",
+                    callback_data="магазин")
+                )
                 await message.reply(
-                    f'Вы заработали {money} монет. Сейчас вы отработали {get_work_use(message.from_user.id)[0]} раз')
+                    f'Вы заработали {money} монет. Сейчас вы отработали {get_work_use(message.from_user.id)[0]} раз',
+                    reply_markup=builder.as_markup())
                 if check_reminder(message.from_user.id) is None:
                     builder = InlineKeyboardBuilder()
                     builder.add(types.InlineKeyboardButton(
@@ -113,8 +118,14 @@ async def work(message: types.Message, state: FSMContext):
                     update_reminder(message.from_user.id, datetime.datetime.now().strftime('%Y-%m-%d %H:%M'))
                 except:
                     pass
+                builder = InlineKeyboardBuilder()
+                builder.add(types.InlineKeyboardButton(
+                    text="В магазин",
+                    callback_data="магазин")
+                )
                 await message.reply(
-                    f'Вы заработали {money} монет. Сейчас вы отработали {get_work_use(message.from_user.id)[0]} раз')
+                    f'Вы заработали {money} монет. Сейчас вы отработали {get_work_use(message.from_user.id)[0]} раз',
+                    reply_markup=builder.as_markup())
                 if check_reminder(message.from_user.id) is None:
                     builder = InlineKeyboardBuilder()
                     builder.add(types.InlineKeyboardButton(
@@ -137,8 +148,14 @@ async def work(message: types.Message, state: FSMContext):
                     update_reminder(message.from_user.id, datetime.datetime.now().strftime('%Y-%m-%d %H:%M'))
                 except:
                     pass
+                builder = InlineKeyboardBuilder()
+                builder.add(types.InlineKeyboardButton(
+                    text="В магазин",
+                    callback_data="магазин")
+                )
                 await message.reply(
-                    f'Вы заработали {money} монет. Сейчас вы отработали {get_work_use(message.from_user.id)[0]} раз')
+                    f'Вы заработали {money} монет. Сейчас вы отработали {get_work_use(message.from_user.id)[0]} раз',
+                    reply_markup=builder.as_markup())
                 if check_reminder(message.from_user.id) is None:
                     builder = InlineKeyboardBuilder()
                     builder.add(types.InlineKeyboardButton(
@@ -176,8 +193,14 @@ async def work(message: types.Message, state: FSMContext):
                     update_reminder(message.from_user.id, datetime.datetime.now().strftime('%Y-%m-%d %H:%M'))
                 except:
                     pass
+                builder = InlineKeyboardBuilder()
+                builder.add(types.InlineKeyboardButton(
+                    text="В магазин",
+                    callback_data="магазин")
+                )
                 await message.reply(
-                    f'Вы заработали {money} монет. Сейчас вы отработали {get_work_use(message.from_user.id)[0]} раз')
+                    f'Вы заработали {money} монет. Сейчас вы отработали {get_work_use(message.from_user.id)[0]} раз',
+                    reply_markup=builder.as_markup())
                 if check_reminder(message.from_user.id) is None:
                     builder = InlineKeyboardBuilder()
                     builder.add(types.InlineKeyboardButton(
@@ -200,8 +223,14 @@ async def work(message: types.Message, state: FSMContext):
                     update_reminder(message.from_user.id, datetime.datetime.now().strftime('%Y-%m-%d %H:%M'))
                 except:
                     pass
+                builder = InlineKeyboardBuilder()
+                builder.add(types.InlineKeyboardButton(
+                    text="В магазин",
+                    callback_data="магазин")
+                )
                 await message.reply(
-                    f'Вы заработали {money} монет. Сейчас вы отработали {get_work_use(message.from_user.id)[0]} раз')
+                    f'Вы заработали {money} монет. Сейчас вы отработали {get_work_use(message.from_user.id)[0]} раз',
+                    reply_markup=builder.as_markup())
                 if check_reminder(message.from_user.id) is None:
                     builder = InlineKeyboardBuilder()
                     builder.add(types.InlineKeyboardButton(
@@ -224,8 +253,14 @@ async def work(message: types.Message, state: FSMContext):
                     update_reminder(message.from_user.id, datetime.datetime.now().strftime('%Y-%m-%d %H:%M'))
                 except:
                     pass
+                builder = InlineKeyboardBuilder()
+                builder.add(types.InlineKeyboardButton(
+                    text="В магазин",
+                    callback_data="магазин")
+                )
                 await message.reply(
-                    f'Вы заработали {money} монет. Сейчас вы отработали {get_work_use(message.from_user.id)[0]} раз')
+                    f'Вы заработали {money} монет. Сейчас вы отработали {get_work_use(message.from_user.id)[0]} раз',
+                    reply_markup=builder.as_markup())
                 if check_reminder(message.from_user.id) is None:
                     builder = InlineKeyboardBuilder()
                     builder.add(types.InlineKeyboardButton(
@@ -249,18 +284,26 @@ async def work(message: types.Message, state: FSMContext):
             f'Вы уже работали сегодня, возвращайтесь через {time_until_next_use}!')
 
 
+@router.callback_query(F.data == 'магазин')
+async def shop1(callback: types.CallbackQuery):
+    await shop(callback.message)
+
+
 @router.callback_query(F.data == 'да', Remind.YesOrNo)
 async def yes(callback: types.CallbackQuery, state: FSMContext):
     now = datetime.datetime.now().strftime('%Y-%m-%d %H:%M')
     new_reminder(callback.from_user.id, callback.from_user.full_name, now)
-    await callback.message.answer('Вы подписались на рассылку! Не забудьте начать диалог с ботом, если вы его ещё не начали')
+    await callback.message.answer(
+        'Вы подписались на рассылку! Не забудьте начать диалог с ботом, если вы его ещё не начали')
     await bot.send_message(callback.from_user.id, 'Проверка. Вы подписались на напоминание')
     await state.clear()
+
 
 @router.callback_query(F.data == 'нет', Remind.YesOrNo)
 async def no(callback: types.CallbackQuery, state: FSMContext):
     await callback.message.answer('Как хотите!')
     await state.clear()
+
 
 @router.message(Remind.YesOrNo)
 async def yes_or_no(message: types.Message, state: FSMContext):
@@ -273,10 +316,12 @@ async def yes_or_no(message: types.Message, state: FSMContext):
         await message.reply('Как хотите!')
     await state.clear()
 
+
 @router.message(Command('Отписаться', 'отписаться', prefix='!'))
 async def unsubscribe(message: types.Message):
     delete_reminder(message.from_user.id)
     await message.reply('Вы отписались от рассылки!')
+
 
 @router.message(Command('повышение', 'Повышение', prefix='!'))
 async def upgrade(message: types.Message):
@@ -318,12 +363,74 @@ async def heal(message: types.Message):
 
 @router.message(Command('магазин', 'Магазин', prefix='!'))
 async def shop(message: types.Message):
+    builder = InlineKeyboardBuilder()
+    builder.row(
+        types.InlineKeyboardButton(
+            text="Купить соду",
+            callback_data="сода"
+        ),
+        types.InlineKeyboardButton(
+            text="Купить настойку",
+            callback_data="настойка"
+        )
+    )
+    builder.row(
+        types.InlineKeyboardButton(
+            text="Купить европейский препарат",
+            callback_data="европейский препарат"
+        ),
+        types.InlineKeyboardButton(
+            text="Купить лекарство от болезни",
+            callback_data="лекарство от болезни"
+        )
+    )
     await message.reply('Доступные товары:\n'
                         'Сода(1 уровень) - 10 монет\n'
                         'Настойка(2 уровень) - 40 монет\n'
                         'Европейский препарат(3 уровень) - 80 монет(Чтобы купить, пишите просто препарат))\n'
                         'Лекарство от болезни - 300 монет\n'
-                        'Чтобы купить товар напишите "!купить название_товара количество_товара"(без надписей в скобках)')
+                        'Чтобы купить товар напишите "!купить название_товара количество_товара"(без надписей в скобках)',
+                        reply_markup=builder.as_markup())
+
+
+@router.callback_query(F.data == 'сода')
+async def buy_soda(callback: types.CallbackQuery):
+    money = get_money(callback.from_user.id)[0]
+    if money >= 10:
+        update_object1(callback.from_user.id, get_objects(callback.from_user.id)[0] + 1, money - 10)
+        await callback.message.reply(f'Вы купили соду')
+    else:
+        await callback.message.reply('Недостаточно монет!')
+
+
+@router.callback_query(F.data == 'настойка')
+async def buy_nastoyka(callback: types.CallbackQuery):
+    money = get_money(callback.from_user.id)[0]
+    if money >= 40:
+        update_object2(callback.from_user.id, get_objects(callback.from_user.id)[1] + 1, money - 40)
+        await callback.message.reply(f'Вы купили настойку')
+    else:
+        await callback.message.reply('Недостаточно монет!')
+
+
+@router.callback_query(F.data == 'европейский препарат')
+async def buy_preparat(callback: types.CallbackQuery):
+    money = get_money(callback.from_user.id)[0]
+    if money >= 80:
+        update_object3(callback.from_user.id, get_objects(callback.from_user.id)[2] + 1, money - 80)
+        await callback.message.reply(f'Вы купили европейский препарат')
+    else:
+        await callback.message.reply('Недостаточно монет!')
+
+
+@router.callback_query(F.data == 'лекарство от болезни')
+async def buy_medicine(callback: types.CallbackQuery):
+    money = get_money(callback.from_user.id)[0]
+    if money >= 300:
+        update_medicine(callback.from_user.id, get_medicine(callback.from_user.id)[0] + 1, money - 300)
+        await callback.message.reply(f'Вы купили лекарство от болезни')
+    else:
+        await callback.message.reply('Недостаточно монет!')
 
 
 @router.message(Command('монеты', 'Монеты', 'баланс', 'Баланс', prefix='!'))
@@ -372,10 +479,10 @@ async def buy(message: types.Message):
 async def inventory(message: types.Message):
     inventory = get_inventory(message.from_user.id)
     await message.reply(f'Ваш инвентарь:\n'
-                        f'Сода: {inventory[0]} штук\n'
-                        f'Настойка: {inventory[1]} штук\n'
-                        f'Европейский препарат: {inventory[2]} штук\n'
-                        f'Лекарство от болезни: {inventory[3]} штук')
+                        f'Сода: {inventory[0]} шт\n'
+                        f'Настойка: {inventory[1]} шт\n'
+                        f'Европейский препарат: {inventory[2]} шт\n'
+                        f'Лекарство от болезни: {inventory[3]} шт')
 
 
 @router.message(Command('писька', 'хуй', prefix='!'))
@@ -462,10 +569,12 @@ async def credit(message: types.Message):
                 days=14):
             if last_date_loan is None or datetime.datetime.now() - datetime.datetime.strptime(last_date_loan,
                                                                                               '%Y-%m-%d %H:%M:%S.%f') > datetime.timedelta(
-                    hours=24):
+                hours=24):
                 try:
-                    loan = 10 * (datetime.datetime.now() - datetime.datetime.strptime(get_loan(userid)[4], '%Y-%m-%d %H:%M:%S.%f')).days
-                    update_loan_balance(userid, get_loan(userid)[1] + loan, datetime.datetime.now(), datetime.datetime.now())
+                    loan = 10 * (datetime.datetime.now() - datetime.datetime.strptime(get_loan(userid)[4],
+                                                                                      '%Y-%m-%d %H:%M:%S.%f')).days
+                    update_loan_balance(userid, get_loan(userid)[1] + loan, datetime.datetime.now(),
+                                        datetime.datetime.now())
                     await message.reply(f'Ваш долг увеличился на {loan} монет из-за просрочки на {days} дней!')
                     await message.reply(
                         f'Ваш долг составляет {get_loan(userid)[1]} монет! У вас осталось {days} дней')
@@ -501,10 +610,12 @@ async def repay_loan(message: types.Message):
                 days=14):
             if last_date_loan is None or datetime.datetime.now() - datetime.datetime.strptime(last_date_loan,
                                                                                               '%Y-%m-%d %H:%M:%S.%f') > datetime.timedelta(
-                    hours=24):
+                hours=24):
                 try:
-                    loan = 10 * (datetime.datetime.now() - datetime.datetime.strptime(get_loan(userid)[4], '%Y-%m-%d %H:%M:%S.%f')).days
-                    update_loan_balance(userid, get_loan(userid)[1] + loan, datetime.datetime.now(), datetime.datetime.now())
+                    loan = 10 * (datetime.datetime.now() - datetime.datetime.strptime(get_loan(userid)[4],
+                                                                                      '%Y-%m-%d %H:%M:%S.%f')).days
+                    update_loan_balance(userid, get_loan(userid)[1] + loan, datetime.datetime.now(),
+                                        datetime.datetime.now())
                     if get_money(userid)[0] >= get_loan(userid)[1]:
                         update_money(userid, get_money(userid)[0] - get_loan(userid)[1])
 
