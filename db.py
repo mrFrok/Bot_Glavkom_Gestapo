@@ -361,7 +361,10 @@ def full_update(userid, username, name):
     c.execute('UPDATE restricts SET name=?, username=? WHERE userid = ?', (name, username, userid))
     c.execute('UPDATE reputations SET name=?, username=? WHERE userid = ?', (name, username, userid))
     c.execute('UPDATE reminder SET name=? WHERE userid = ?', (name, userid))
-    c.execute('UPDATE marriages SET name=? WHERE userid1 = ? OR userid2 = ?', (name, userid, userid))
+    try:
+        c.execute('UPDATE marriages SET name1=? WHERE userid1 = ?', (name, userid))
+    except:
+        c.execute('UPDATE marriages SET name2=? WHERE userid2 = ?', (name, userid))
     conn.commit()
 
 
@@ -638,7 +641,6 @@ def get_marriages():
     users = c.fetchall()
     conn.close()
     return users
-
 
 
 def delete_marriage(userid1, userid2):

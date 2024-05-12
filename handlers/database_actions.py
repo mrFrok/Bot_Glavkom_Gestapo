@@ -665,7 +665,7 @@ async def repay_loan(message: types.Message):
 
 
 @router.message(Command('топ_хуев', 'тх', prefix='!'))
-async def top_hui(message: types.Message):
+async def top_dicks(message: types.Message):
     top_hui = get_top_dicks()
     response = 'Топ-10 хуёв:\n'
     for i, (userid, name, size) in enumerate(top_hui, start=1):
@@ -987,8 +987,10 @@ async def marriage_break_no(callback: types.CallbackQuery, state: FSMContext):
 @router.message(Command('браки', 'Браки', prefix='!'))
 async def marriage_list(message: types.Message):
     marriages = get_marriages()
+    response = 'Браки этого чата:\n'
     for i, j in enumerate(marriages, start=1):
-        await message.reply(f'{i}. <a href="tg://user?id={j[1]}">{j[5]}</a> и <a href="tg://user?id={j[2]}">{j[6]}</a> с {j[7]}')
+        response += f'{i}. <a href="tg://user?id={j[1]}">{j[5]}</a> и <a href="tg://user?id={j[2]}">{j[6]}</a> с {j[7]}\n'
+    await message.answer(response)
 
 """
 @router.message(Command('учавствовать_в_недрочабре', 'увн', prefix='!'))
