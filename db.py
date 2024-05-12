@@ -51,6 +51,15 @@ def get_user_from_username(username):
     return user
 
 
+def get_user2_from_username(username):
+    conn = sqlite3.connect('database.db')
+    c = conn.cursor()
+    c.execute('SELECT * FROM users WHERE username = ?', (username,))
+    user = c.fetchone()
+    conn.close()
+    return user
+
+
 def delete_user(userid):
     conn = sqlite3.connect('database.db')
     c = conn.cursor()
@@ -351,6 +360,8 @@ def full_update(userid, username, name):
     c.execute('UPDATE varns SET name=?, username=? WHERE userid = ?', (name, username, userid))
     c.execute('UPDATE restricts SET name=?, username=? WHERE userid = ?', (name, username, userid))
     c.execute('UPDATE reputations SET name=?, username=? WHERE userid = ?', (name, username, userid))
+    c.execute('UPDATE reminder SET name=? WHERE userid = ?', (name, userid))
+    c.execute('UPDATE marriages SET name=? WHERE userid1 = ? OR userid2 = ?', (name, userid, userid))
     conn.commit()
 
 
@@ -608,3 +619,66 @@ def get_about(userid):
     user = c.fetchone()
     conn.close()
     return user
+
+
+def add_marriage(userid1, userid2, username1, username2, name1, name2, date):
+    conn = sqlite3.connect('database.db')
+    c = conn.cursor()
+    c.execute(
+        'INSERT INTO marriages (userid1, userid2, username1, username2, name1, name2, date) VALUES (?, ?, ?, ?, ?, ?, ?)',
+        (userid1, userid2, username1, username2, name1, name2, date))
+    conn.commit()
+    conn.close()
+
+
+def get_marriages():
+    conn = sqlite3.connect('database.db')
+    c = conn.cursor()
+    c.execute('SELECT * FROM marriages ORDER BY date')
+    users = c.fetchall()
+    conn.close()
+    return users
+
+
+
+def delete_marriage(userid1, userid2):
+    conn = sqlite3.connect('database.db')
+    c = conn.cursor()
+    c.execute('DELETE FROM marriages WHERE userid1=? AND userid2=?', (userid1, userid2))
+    conn.commit()
+    conn.close()
+
+
+def check_marriage(userid):
+    conn = sqlite3.connect('database.db')
+    c = conn.cursor()
+    c.execute('SELECT * FROM marriages WHERE userid1=? OR userid2=?', (userid, userid))
+    user = c.fetchall()
+    conn.close()
+    return user
+
+
+def add_temp(userid1, userid2, username1, username2, name1, name2):
+    conn = sqlite3.connect('database.db')
+    c = conn.cursor()
+    c.execute('INSERT INTO temp (userid1, userid2, username1, username2, name1, name2) VALUES (?, ?, ?, ?, ?, ?)',
+              (userid1, userid2, username1, username2, name1, name2))
+    conn.commit()
+    conn.close()
+
+
+def get_temp(userid):
+    conn = sqlite3.connect('database.db')
+    c = conn.cursor()
+    c.execute('SELECT * FROM temp WHERE userid1=? OR userid2=?', (userid, userid))
+    user = c.fetchall()
+    conn.close()
+    return user
+
+
+def delete_temp(userid1, userid2):
+    conn = sqlite3.connect('database.db')
+    c = conn.cursor()
+    c.execute('DELETE FROM temp WHERE userid1=? AND userid2=?', (userid1, userid2))
+    conn.commit()
+    conn.close()

@@ -1,6 +1,7 @@
 import asyncio
 import random
 from aiogram import types, Router, F
+import re
 from aiogram.filters import Command
 from aiogram.types import Message
 from random import randint, choice
@@ -17,7 +18,8 @@ from db import add_user, update_user, update_dick1, update_dick2, update_dick3, 
     update_work_use, update_work_level, update_sick, heal_sick, get_objects, update_object1, update_object2, \
     update_object3, update_medicine, get_last_worked, update_money, update_last_worked, get_money, get_inventory, \
     get_medicine, get_sick, decrease_dick, update_about, get_about, add_loan, get_loan, update_loan_balance, \
-    repay_the_loan
+    repay_the_loan, check_marriage, add_marriage, get_marriages, delete_marriage, get_user2_from_username, add_temp, \
+    get_temp, delete_temp
 import datetime
 from pyrogram_config import get_chat_members_id, get_chat_members_name, get_chat_members_username
 from filters import IsAdminFilter
@@ -100,14 +102,17 @@ async def work(message: types.Message, state: FSMContext):
                     builder = InlineKeyboardBuilder()
                     builder.add(types.InlineKeyboardButton(
                         text="Да",
-                        callback_data="да")
+                        callback_data="дар")
                     )
                     builder.add(types.InlineKeyboardButton(
                         text="Нет",
-                        callback_data="нет")
+                        callback_data="нетр")
                     )
                     await message.reply('Хотите ли вы подписаться на рассылку?', reply_markup=builder.as_markup())
                     await state.set_state(Remind.YesOrNo)
+                    await asyncio.sleep(600)
+                    await message.answer('Так как ответа нет уже 10 минут, все стейты были очищены!')
+                    await state.clear()
             elif level == 2:
                 money_old = get_money(message.from_user.id)[0]
                 money = randint(20, 40)
@@ -130,14 +135,17 @@ async def work(message: types.Message, state: FSMContext):
                     builder = InlineKeyboardBuilder()
                     builder.add(types.InlineKeyboardButton(
                         text="Да",
-                        callback_data="да")
+                        callback_data="дар")
                     )
                     builder.add(types.InlineKeyboardButton(
                         text="Нет",
-                        callback_data="нет")
+                        callback_data="нетр")
                     )
                     await message.reply('Хотите ли вы подписаться на рассылку?', reply_markup=builder.as_markup())
                     await state.set_state(Remind.YesOrNo)
+                    await asyncio.sleep(600)
+                    await message.answer('Так как ответа нет уже 10 минут, все стейты были очищены!')
+                    await state.clear()
             elif level == 3:
                 money_old = get_money(message.from_user.id)[0]
                 money = randint(40, 80)
@@ -160,14 +168,17 @@ async def work(message: types.Message, state: FSMContext):
                     builder = InlineKeyboardBuilder()
                     builder.add(types.InlineKeyboardButton(
                         text="Да",
-                        callback_data="да")
+                        callback_data="дар")
                     )
                     builder.add(types.InlineKeyboardButton(
                         text="Нет",
-                        callback_data="нет")
+                        callback_data="нетр")
                     )
                     await message.reply('Хотите ли вы подписаться на рассылку?', reply_markup=builder.as_markup())
                     await state.set_state(Remind.YesOrNo)
+                    await asyncio.sleep(600)
+                    await message.answer('Так как ответа нет уже 10 минут, все стейты были очищены!')
+                    await state.clear()
             else:
                 await message.reply('Ошибка какая то :)')
         else:
@@ -205,14 +216,17 @@ async def work(message: types.Message, state: FSMContext):
                     builder = InlineKeyboardBuilder()
                     builder.add(types.InlineKeyboardButton(
                         text="Да",
-                        callback_data="да")
+                        callback_data="дар")
                     )
                     builder.add(types.InlineKeyboardButton(
                         text="Нет",
-                        callback_data="нет")
+                        callback_data="нетр")
                     )
                     await message.reply('Хотите ли вы подписаться на рассылку?', reply_markup=builder.as_markup())
                     await state.set_state(Remind.YesOrNo)
+                    await asyncio.sleep(600)
+                    await message.answer('Так как ответа нет уже 10 минут, все стейты были очищены!')
+                    await state.clear()
             elif level == 2:
                 money_old = get_money(message.from_user.id)[0]
                 money = randint(20, 40)
@@ -235,14 +249,17 @@ async def work(message: types.Message, state: FSMContext):
                     builder = InlineKeyboardBuilder()
                     builder.add(types.InlineKeyboardButton(
                         text="Да",
-                        callback_data="да")
+                        callback_data="дар")
                     )
                     builder.add(types.InlineKeyboardButton(
                         text="Нет",
-                        callback_data="нет")
+                        callback_data="нетр")
                     )
                     await message.reply('Хотите ли вы подписаться на рассылку?', reply_markup=builder.as_markup())
                     await state.set_state(Remind.YesOrNo)
+                    await asyncio.sleep(600)
+                    await message.answer('Так как ответа нет уже 10 минут, все стейты были очищены!')
+                    await state.clear()
             elif level == 3:
                 money_old = get_money(message.from_user.id)[0]
                 money = randint(40, 80)
@@ -265,14 +282,17 @@ async def work(message: types.Message, state: FSMContext):
                     builder = InlineKeyboardBuilder()
                     builder.add(types.InlineKeyboardButton(
                         text="Да",
-                        callback_data="да")
+                        callback_data="дар")
                     )
                     builder.add(types.InlineKeyboardButton(
                         text="Нет",
-                        callback_data="нет")
+                        callback_data="нетр")
                     )
                     await message.reply('Хотите ли вы подписаться на рассылку?', reply_markup=builder.as_markup())
                     await state.set_state(Remind.YesOrNo)
+                    await asyncio.sleep(600)
+                    await message.answer('Так как ответа нет уже 10 минут, все стейты были очищены!')
+                    await state.clear()
             else:
                 await message.reply('Ошибка какая то :)')
     else:
@@ -289,7 +309,7 @@ async def shop1(callback: types.CallbackQuery):
     await shop(callback.message)
 
 
-@router.callback_query(F.data == 'да', Remind.YesOrNo)
+@router.callback_query(F.data == 'дар', Remind.YesOrNo)
 async def yes(callback: types.CallbackQuery, state: FSMContext):
     now = datetime.datetime.now().strftime('%Y-%m-%d %H:%M')
     new_reminder(callback.from_user.id, callback.from_user.full_name, now)
@@ -299,21 +319,9 @@ async def yes(callback: types.CallbackQuery, state: FSMContext):
     await state.clear()
 
 
-@router.callback_query(F.data == 'нет', Remind.YesOrNo)
+@router.callback_query(F.data == 'нетр', Remind.YesOrNo)
 async def no(callback: types.CallbackQuery, state: FSMContext):
     await callback.message.answer('Как хотите!')
-    await state.clear()
-
-
-@router.message(Remind.YesOrNo)
-async def yes_or_no(message: types.Message, state: FSMContext):
-    if message.text == 'да':
-        now = datetime.datetime.now().strftime('%Y-%m-%d %H:%M')
-        new_reminder(message.from_user.id, message.from_user.full_name, now)
-        await bot.send_message(message.from_user.id, 'Проверка. Вы подписались на напоминание')
-        await message.reply('Вы подписались на рассылку! Не забудьте начать диалог с ботом, если вы его ещё не начали')
-    else:
-        await message.reply('Как хотите!')
     await state.clear()
 
 
@@ -384,7 +392,9 @@ async def shop(message: types.Message):
             callback_data="лекарство от болезни"
         )
     )
-    await message.reply('Доступные товары:\n'
+    await message.reply(f'Здравствуйте, {message.from_user.full_name}!\n'
+                        f'Ваш баланс: {get_money(message.from_user.id)[0]} монет\n'
+                        'Доступные товары:\n'
                         'Сода(1 уровень) - 10 монет\n'
                         'Настойка(2 уровень) - 40 монет\n'
                         'Европейский препарат(3 уровень) - 80 монет(Чтобы купить, пишите просто препарат))\n'
@@ -854,50 +864,131 @@ async def about_user(message: types.Message):
             await message.answer(f'Вот ваша биография:\n{about}')
 
 
-'''
-@router.message(Command('рассылка', 'Рассылка', prefix='!'))
-async def reminder(message: types.Message, state: FSMContext):
-    check = check_reminder(message.from_user.id)
-    if check == None:
-        await state.set_state(Form.question1)
-        await message.reply(
-            f'Сейчас вы не подписаны на рассылку. Вы хотите подписаться на рассылку?(Напишите Да/Нет)\nВНИМАНИЕ! Чтобы бот мог прислать вам напоминание, вы должны начать с ним чат!')
-    else:
-        await state.set_state(Form.question1)
-        await message.reply(
-            f'Прямо сейчас вы подписаны на рассылку. Желаете ли вы отписаться от рассылки или изменить время получения рассылки?\nВведите "Отписаться", чтобы отписаться от рассылки или "изменить", чтобы изменить время.')
+class MarriageForm(StatesGroup):
+    sogl = State()
 
 
-@router.message(Form.question1)
-async def form_question1(message: Message, state: FSMContext):
-    await state.update_data(question1=message.text)
-    que = await state.get_data()
-    await state.clear()
-    question = que['question1']
-    if question.lower() == 'да':
-        new_reminder(message.from_user.id, message.from_user.full_name)
-        await message.reply(
-            f'Вы успешно подписались на рассылку. Теперь, каждый день в 6:00 по МСК вы будете получать рассылку.\nУбедитесь, что вы начали чат с ботом, иначе он не сможет присылать сообщения')
-    else:
-        await message.reply(f'Как хотите.')
-'''
-"""
-@router.message(Form.question2)
-async def form_question2(message: Message, state: FSMContext):
-    if message.text.isdigit():
-        await state.update_data(question2=message.text)
-        que = await state.get_data()
-        time = int(que['question2'])
-        if time >= 0 and time <= 24:
-            new_reminder(message.from_user.id, message.from_user.full_name, time)
-            await message.reply(
-                f'Вы успешно подписались на рассылку. Теперь, каждый день в {time} час(-ов, -а).\nУбедитесь, что вы начали чат с ботом, иначе он не сможет присылать сообщения')
-            await state.clear()
+@router.message(Command('брак', 'Брак', prefix='!'))
+async def marriage(message: types.Message, state: FSMContext):
+    check = check_marriage(message.from_user.id)
+    if not check:
+        mention = re.search(r'@(\w+)', message.text)
+        if mention:
+            user2 = get_user2_from_username(mention.group(1))
+            if user2 is None:
+                await message.reply('Пользователь не найден')
+                await state.clear()
+                return
+            elif user2[1] == message.from_user.id:
+                await message.reply('Вы не можете оформить брак с самим собой!')
+                await state.clear()
+                return
+            else:
+                await state.update_data(userid2=user2[1], username2=user2[2], name2=user2[3])
+                builder = InlineKeyboardBuilder()
+                builder.add(types.InlineKeyboardButton(
+                    text="Да",
+                    callback_data="дам")
+                )
+                builder.add(types.InlineKeyboardButton(
+                    text="Нет",
+                    callback_data="нетм")
+                )
+                await message.answer(
+                    f'Внимание, <a href="tg://user?id={user2[1]}">{user2[3]}</a>!\nВы хотите оформить брак с <a href="tg://user?id={message.from_user.id}">{message.from_user.full_name}</a>?',
+                    reply_markup=builder.as_markup())
+                await state.set_state(MarriageForm.sogl)
+                add_temp(message.from_user.id, user2[1], message.from_user.username, user2[2],
+                         message.from_user.full_name, user2[3])
+                await asyncio.sleep(600)
+                await message.answer('Так как ответа нет уже 10 минут, все стейты были очищены!')
+                await state.clear()
         else:
-            await message.reply(f'Неправильное время! Должно быть от 0 до 24, попробуйте снова!')
+            await message.reply('Вы не указали пользователя! Напишите "!брак @имя_пользователя"')
     else:
-        await message.reply(f'Вы ввели часы неправильно! Попробуйте заново')
-"""
+        await message.reply('Вы уже состоите в браке!')
+
+
+@router.callback_query(F.data == 'дам')
+async def marriage_yes(callback: types.CallbackQuery, state: FSMContext):
+    userid = callback.from_user.id
+    userid2 = get_temp(userid)[0][2]
+    if userid2 == userid:
+        users_data = get_temp(callback.from_user.id)[0]
+        date = datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+        add_marriage(userid1=users_data[1], userid2=users_data[2], username1=users_data[3], username2=users_data[4],
+                     name1=users_data[5], name2=users_data[6], date=date)
+        await callback.message.answer(
+            f'Внимание, чат!\nБрак между <a href="tg://user?id={users_data[1]}">{users_data[5]}</a> и <a href="tg://user?id={users_data[2]}">{users_data[6]}</a> был оформлен!')
+        await state.clear()
+        delete_temp(users_data[1], users_data[2])
+    else:
+        pass
+
+
+@router.callback_query(F.data == 'нетм')
+async def marriage_no(callback: types.CallbackQuery, state: FSMContext):
+    userid = callback.from_user.id
+    userid2 = get_temp(userid)[0]
+    if userid2[2] == userid:
+        await callback.message.answer('Брак не оформлен!')
+        await state.clear()
+        delete_temp(userid2[1], userid2[2])
+    else:
+        pass
+
+
+@router.message(Command('бракинфо', 'Бракинфо', prefix='!'))
+async def marriage_info(message: types.Message):
+    marriages = check_marriage(message.from_user.id)
+    print(marriages)
+    if not marriages:
+        await message.reply('Вы еще не состоите в браке!')
+    else:
+        mari_info = check_marriage(message.from_user.id)[0]
+        await message.reply(
+            f'Вот ваш брак:\nПервый супруг(Инициатор брака): <a href="tg://user?id={mari_info[1]}">{mari_info[5]}</a>\nВторой супруг: <a href="tg://user?id={mari_info[2]}">{mari_info[6]}</a>\nДата заключения брака: {mari_info[7]}')
+
+
+@router.message(Command('развод', 'Развод', prefix='!'))
+async def marriage_break(message: types.Message, state: FSMContext):
+    marriages = check_marriage(message.from_user.id)
+    if not marriages:
+        await message.reply('Вы еще не состоите в браке!')
+        return
+    else:
+        builder = InlineKeyboardBuilder()
+        builder.add(types.InlineKeyboardButton(
+            text="Да",
+            callback_data="дараз")
+        )
+        builder.add(types.InlineKeyboardButton(
+            text="Нет",
+            callback_data="нетраз")
+        )
+        await message.reply(f'Вы точно хотите развестись? Это действие необратимо!!!', reply_markup=builder.as_markup())
+        await state.set_state(MarriageForm.sogl)
+
+
+@router.callback_query(F.data == 'дараз', MarriageForm.sogl)
+async def marriage_break_yes(callback: types.CallbackQuery, state: FSMContext):
+    marriages = check_marriage(callback.from_user.id)[0]
+    delete_marriage(marriages[1], marriages[2])
+    await callback.message.answer(f'Внимание чат!\n<a href="tg://user?id={marriages[1]}">{marriages[5]}</a> и <a href="tg://user?id={marriages[2]}">{marriages[6]}</a> развелись!')
+    await state.clear()
+
+
+@router.callback_query(F.data == 'нетраз', MarriageForm.sogl)
+async def marriage_break_no(callback: types.CallbackQuery, state: FSMContext):
+    await callback.message.answer('Ваш брак был сохранен!')
+    await state.clear()
+
+
+@router.message(Command('браки', 'Браки', prefix='!'))
+async def marriage_list(message: types.Message):
+    marriages = get_marriages()
+    for i, j in enumerate(marriages, start=1):
+        await message.reply(f'{i}. <a href="tg://user?id={j[1]}">{j[5]}</a> и <a href="tg://user?id={j[2]}">{j[6]}</a> с {j[7]}')
 
 """
 @router.message(Command('учавствовать_в_недрочабре', 'увн', prefix='!'))
