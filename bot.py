@@ -38,8 +38,11 @@ async def send_reminders():
                                                                     '%Y-%m-%d %H:%M') > datetime.timedelta(
                     hours=24):
                 if subscriber[2] == 0:
-                    await bot.send_message(subscriber[0], f'Ежедневная рассылка! Не забудьте прописать !работать в чате(Вы это уже можете!)')
-                    update_send_remind(subscriber[0])
+                    try:
+                        await bot.send_message(subscriber[0], f'Ежедневная рассылка! Не забудьте прописать !работать в чате(Вы это уже можете!)')
+                        update_send_remind(subscriber[0])
+                    except:
+                        continue
         await asyncio.sleep(60)
 
 

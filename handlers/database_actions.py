@@ -21,7 +21,7 @@ from db import add_user, update_user, update_dick1, update_dick2, update_dick3, 
     repay_the_loan, check_marriage, add_marriage, get_marriages, delete_marriage, get_user2_from_username, add_temp, \
     get_temp, delete_temp
 import datetime
-from pyrogram_config import get_chat_members_id, get_chat_members_name, get_chat_members_username
+from pyrogram_config import get_chat_members
 from filters import IsAdminFilter
 import re
 from aiogram.fsm.state import StatesGroup, State
@@ -111,7 +111,6 @@ async def work(message: types.Message, state: FSMContext):
                     await message.reply('Хотите ли вы подписаться на рассылку?', reply_markup=builder.as_markup())
                     await state.set_state(Remind.YesOrNo)
                     await asyncio.sleep(600)
-                    await message.answer('Так как ответа нет уже 10 минут, все стейты были очищены!')
                     await state.clear()
             elif level == 2:
                 money_old = get_money(message.from_user.id)[0]
@@ -144,7 +143,6 @@ async def work(message: types.Message, state: FSMContext):
                     await message.reply('Хотите ли вы подписаться на рассылку?', reply_markup=builder.as_markup())
                     await state.set_state(Remind.YesOrNo)
                     await asyncio.sleep(600)
-                    await message.answer('Так как ответа нет уже 10 минут, все стейты были очищены!')
                     await state.clear()
             elif level == 3:
                 money_old = get_money(message.from_user.id)[0]
@@ -177,7 +175,6 @@ async def work(message: types.Message, state: FSMContext):
                     await message.reply('Хотите ли вы подписаться на рассылку?', reply_markup=builder.as_markup())
                     await state.set_state(Remind.YesOrNo)
                     await asyncio.sleep(600)
-                    await message.answer('Так как ответа нет уже 10 минут, все стейты были очищены!')
                     await state.clear()
             else:
                 await message.reply('Ошибка какая то :)')
@@ -225,7 +222,6 @@ async def work(message: types.Message, state: FSMContext):
                     await message.reply('Хотите ли вы подписаться на рассылку?', reply_markup=builder.as_markup())
                     await state.set_state(Remind.YesOrNo)
                     await asyncio.sleep(600)
-                    await message.answer('Так как ответа нет уже 10 минут, все стейты были очищены!')
                     await state.clear()
             elif level == 2:
                 money_old = get_money(message.from_user.id)[0]
@@ -258,7 +254,6 @@ async def work(message: types.Message, state: FSMContext):
                     await message.reply('Хотите ли вы подписаться на рассылку?', reply_markup=builder.as_markup())
                     await state.set_state(Remind.YesOrNo)
                     await asyncio.sleep(600)
-                    await message.answer('Так как ответа нет уже 10 минут, все стейты были очищены!')
                     await state.clear()
             elif level == 3:
                 money_old = get_money(message.from_user.id)[0]
@@ -291,7 +286,6 @@ async def work(message: types.Message, state: FSMContext):
                     await message.reply('Хотите ли вы подписаться на рассылку?', reply_markup=builder.as_markup())
                     await state.set_state(Remind.YesOrNo)
                     await asyncio.sleep(600)
-                    await message.answer('Так как ответа нет уже 10 минут, все стейты были очищены!')
                     await state.clear()
             else:
                 await message.reply('Ошибка какая то :)')
@@ -306,7 +300,36 @@ async def work(message: types.Message, state: FSMContext):
 
 @router.callback_query(F.data == 'магазин')
 async def shop1(callback: types.CallbackQuery):
-    await shop(callback.message)
+    builder = InlineKeyboardBuilder()
+    builder.row(
+        types.InlineKeyboardButton(
+             text="Купить соду",
+             callback_data="сода"
+        ),
+        types.InlineKeyboardButton(
+            text="Купить настойку",
+            callback_data="настойка"
+        )
+    )
+    builder.row(
+        types.InlineKeyboardButton(
+            text="Купить европейский препарат",
+            callback_data="европейский препарат"
+        ),
+        types.InlineKeyboardButton(
+            text="Купить лекарство от болезни",
+            callback_data="лекарство от болезни"
+        )
+    )
+    await callback.message.reply(f'Здравствуйте, {callback.from_user.full_name}!\n'
+                        f'Ваш баланс: {get_money(callback.from_user.id)[0]} монет\n'
+                        'Доступные товары:\n'
+                        'Сода(1 уровень) - 10 монет\n'
+                        'Настойка(2 уровень) - 40 монет\n'
+                        'Европейский препарат(3 уровень) - 80 монет(Чтобы купить, пишите просто препарат))\n'
+                        'Лекарство от болезни - 300 монет\n'
+                        'Чтобы купить товар напишите "!купить название_товара количество_товара"(без надписей в скобках)',
+                        reply_markup=builder.as_markup())
 
 
 @router.callback_query(F.data == 'дар', Remind.YesOrNo)
@@ -737,9 +760,7 @@ async def calling(message: types.Message):
 
 @router.message(Command('доббд', 'дпбд', 'auid', prefix='!/'), IsAdminFilter(is_admin=True))
 async def dobbd(message: types.Message):
-    chat_members_id = await get_chat_members_id(message.chat.id)
-    chat_members_name = await get_chat_members_name(message.chat.id)
-    chat_members_username = await get_chat_members_username(message.chat.id)
+    chat_members = await get_chat_members(message.chat.id)
 
     async def is_bot(user_id, message: types.Message):
         user = await message.bot.get_chat_member(message.chat.id, user_id)
@@ -747,9 +768,9 @@ async def dobbd(message: types.Message):
 
     added_users_count = 0
 
-    for i, x, y in zip(chat_members_id, chat_members_name, chat_members_username):
-        if not await is_bot(i, message):  # Проверяем, не является ли пользователь ботом
-            add_user_if_not_exists(i, y, x, datetime.datetime.now())
+    for user_id, name, username in chat_members:
+        if not await is_bot(user_id, message):  # Проверяем, не является ли пользователь ботом
+            add_user_if_not_exists(user_id, username, name, datetime.datetime.now())
             added_users_count += 1
 
     await message.reply(f'Добавлено {added_users_count} пользователей')
@@ -870,43 +891,39 @@ class MarriageForm(StatesGroup):
 
 @router.message(Command('брак', 'Брак', prefix='!'))
 async def marriage(message: types.Message, state: FSMContext):
-    check = check_marriage(message.from_user.id)
-    if not check:
-        mention = re.search(r'@(\w+)', message.text)
-        if mention:
-            user2 = get_user2_from_username(mention.group(1))
-            if user2 is None:
-                await message.reply('Пользователь не найден')
-                await state.clear()
-                return
-            elif user2[1] == message.from_user.id:
-                await message.reply('Вы не можете оформить брак с самим собой!')
-                await state.clear()
-                return
-            else:
-                await state.update_data(userid2=user2[1], username2=user2[2], name2=user2[3])
-                builder = InlineKeyboardBuilder()
-                builder.add(types.InlineKeyboardButton(
+    mention = re.search(r'@(\w+)', message.text)
+    if mention:
+        user2 = get_user2_from_username(mention.group(1))
+        if user2 is None:
+            await message.reply('Пользователь не найден')
+            await state.clear()
+            return
+        elif user2[1] == message.from_user.id:
+            await message.reply('Вы не можете оформить брак с самим собой!')
+            await state.clear()
+            return
+        else:
+            await state.update_data(userid2=user2[1], username2=user2[2], name2=user2[3])
+            builder = InlineKeyboardBuilder()
+            builder.add(types.InlineKeyboardButton(
                     text="Да",
                     callback_data="дам")
-                )
-                builder.add(types.InlineKeyboardButton(
+            )
+            builder.add(types.InlineKeyboardButton(
                     text="Нет",
                     callback_data="нетм")
-                )
-                await message.answer(
+            )
+            await message.answer(
                     f'Внимание, <a href="tg://user?id={user2[1]}">{user2[3]}</a>!\nВы хотите оформить брак с <a href="tg://user?id={message.from_user.id}">{message.from_user.full_name}</a>?',
                     reply_markup=builder.as_markup())
-                await state.set_state(MarriageForm.sogl)
-                add_temp(message.from_user.id, user2[1], message.from_user.username, user2[2],
+            await state.set_state(MarriageForm.sogl)
+            add_temp(message.from_user.id, user2[1], message.from_user.username, user2[2],
                          message.from_user.full_name, user2[3])
-                await asyncio.sleep(600)
-                await message.answer('Так как ответа нет уже 10 минут, все стейты были очищены!')
-                await state.clear()
-        else:
-            await message.reply('Вы не указали пользователя! Напишите "!брак @имя_пользователя"')
+            await asyncio.sleep(600)
+            await state.clear()
     else:
-        await message.reply('Вы уже состоите в браке!')
+        await message.reply('Вы не указали пользователя! Напишите "!брак @имя_пользователя"')
+
 
 
 @router.callback_query(F.data == 'дам')

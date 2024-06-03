@@ -20,6 +20,10 @@ def add_user_if_not_exists(userid, username, name, date_add):
         c.execute("INSERT INTO users (userid, username, name, date_add) VALUES (?,?,?,?)",
                   (userid, username, name, date_add))
         conn.commit()
+    else:
+        c.execute("UPDATE users SET username=?, name=? WHERE userid=?",
+                  (username, name, userid))
+        conn.commit()
 
     conn.close()
 
